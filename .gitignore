@@ -30,6 +30,7 @@ MANIFEST
 logs/
 runs/
 models/
+checkpoint*/
 data/
 *.pt
 *.json
