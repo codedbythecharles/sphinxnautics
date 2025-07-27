@@ -466,7 +466,7 @@ def distill_simerr(model,teacher,dataloader,optimizer,scheduler,device,pad_token
 
 
 
-def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos_token_id,num_helper_samples=5,optimizer_helper=None,helper=None,move_to_device=False,max_num_steps=None,dataloader_test=None,horizon=1,gradient_accumulation_steps=8,num_epochs=1,num_test_batches=30,print_per_batch=10,batch_size=8,lah=0,temp=0.001,max_new_tokens=256,tokenizer=None,do_sample=False,with_ddp=True,ddp_rank=0,ddp_world_size=1,device_type='cuda',checkpoint_every=500,filename='model',writer=None,past_epoch_steps=0,checkpoint_dir=None,start_step=0,unfreeze_idx=0,eval_every=100):
+def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos_token_id,num_helper_samples=5,optimizer_helper=None,helper=None,move_to_device=False,max_num_steps=None,dataloader_test=None,horizon=1,gradient_accumulation_steps=8,num_epochs=1,num_test_batches=30,print_per_batch=10,batch_size=8,lah=0,temp=0.001,max_new_tokens=256,tokenizer=None,do_sample=False,with_ddp=True,ddp_rank=0,ddp_world_size=1,device_type='cuda',checkpoint_every=500,filename='model',writer=None,past_epoch_steps=0,checkpoint_dir=None,start_step=0,unfreeze_idx=0,eval_every=100,verbose=False):
     losses=[]
     total_steps=start_step
     total_processes_samples=0
@@ -527,18 +527,18 @@ def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos
   #          grad = model.module.model.layers[-1].self_attn.q_proj.weight.grad
             if ddp_rank==0 and unfreeze_idx>0:
                 grad_last = model.module.model.layers[-unfreeze_idx].self_attn.q_proj.weight.grad
-                print(f"Gradient norm qproj layer -{unfreeze_idx}:", grad_last.norm().item() if grad_last is not None else "None")
             grad0 = model.module.lm_head.weight.grad
 #            print("Grad mean:", grad0.mean().item() if grad0 is not None else "None")
             head_mean= model.module.lm_head.weight.mean().detach()
             head_norm=torch.norm(model.module.lm_head.weight).detach()
             grad_norm=grad0.norm().detach()
    #         print("Gradient norm:", grad.norm().item() if grad is not None else "None")
-            if ddp_rank==0:
+            if ddp_rank==0 and verbose and total_steps%print_per_batch==0:
                 print("model.module.lm_head.weight.requires_grad",model.module.lm_head.weight.requires_grad)
                 print("Gradient norm head:", grad0.norm().item() if grad0 is not None else "None")
     #            print("Gradient norm2:", grad2.norm().item() if grad is not None else "None")
             # print('norm',norm)
+                print(f"Gradient norm qproj layer -{unfreeze_idx}:", grad_last.norm().item() if grad_last is not None else "None")
                 print('Norm of head',head_norm)
                 print('Mean of head',head_mean)
                 print('First element head',model.module.lm_head.weight[0][0])
