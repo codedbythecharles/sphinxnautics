@@ -15,6 +15,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+sphinxnautics-codeforces-cot/
 lib64/
 parts/
 sdist/
