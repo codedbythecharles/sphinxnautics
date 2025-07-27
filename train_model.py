@@ -47,8 +47,8 @@ if master_process:
     print(f"total desired batch size: {total_batch_size}")
     print(f"=> calculated gradient accumulation steps: {gradient_accumulation_steps}")
 
-writer = SummaryWriter(log_dir="runs/exp15")
-checkpoint_dir = "checkpoints3p"
+writer = SummaryWriter(log_dir="runs/exp16")
+checkpoint_dir = "checkpoints5"
 os.makedirs(checkpoint_dir, exist_ok=True)
 
 
@@ -158,9 +158,8 @@ def main():
     model_name="Qwen/Qwen2.5-Coder-7B-Instruct"
     parser.add_argument("--model_name",   default=model_name)
     parser.add_argument("--verbose",action="store_true")
-    parser.add_argument("--train_dataset",      default='codeforces_cot_filtered_truncated_matched_train_v1')
-    parser.add_argument("--val_dataset",      default='codeforces_cot_filtered_truncated_matched_val_v1')
-    parser.add_argument("--eval_every", type=int,default=100)
+    parser.add_argument("--train_dataset",      default='haj1r/sphinxnautics-codeforces-cot-v3')
+ #   parser.add_argument("--val_dataset",      default='codeforces_cot_filtered_truncated_matched_val_v1')
     parser.add_argument("--test_dataset",      default='open-r1/codeforces')
     parser.add_argument("--checkpoint_every", type=int,      default=500)
     parser.add_argument("--lr_fac", type=float,      default=1)
@@ -246,8 +245,8 @@ def main():
         torch.cuda.manual_seed(1337)
 
     # prepare the dataset for train/val loss
-    data_codeforces_cot_train = load_from_disk(cfg.train_dataset)
-    data_codeforces_cot_val = load_from_disk(cfg.val_dataset)
+    data_codeforces_cot_train = load_dataset(cfg.train_dataset,split='train')#['train']load_from_disk(cfg.train_dataset,split='train')
+    data_codeforces_cot_val = load_dataset(cfg.train_dataset,split='validation')
     #prepaer the dataset for end to end testing
     test_ds_full = load_dataset(cfg.test_dataset, split="test").select(range(cfg.val_sample_per_gpu*ddp_world_size))
     if cfg.verbose:
@@ -256,8 +255,8 @@ def main():
     final_lr = max_lr * min_factor
 
     keep_opt_stat=False
+    total_steps=(total_examples_per_gpu//gradient_accumulation_steps)* cfg.num_epochs
     if cfg.resume_path is not None:
-        total_steps=(total_examples_per_gpu//gradient_accumulation_steps)* cfg.num_epochs
         optim_groups=helpers.configure_optimizers(model,weight_decay,print_it=False)
         optimizer=torch.optim.AdamW(optim_groups,lr=max_lr,fused=use_fused) 
         scheduler = get_polynomial_decay_schedule_with_warmup(
@@ -376,7 +375,7 @@ def main():
         checkpoint_dir_=checkpoint_dir+'/'+filename
         if ddp_rank==0:
             os.makedirs(checkpoint_dir_, exist_ok=True)
-        helpers.pretrain_simerr(model,train_loader,optimizer,scheduler,device,tokenizer.pad_token_id,tokenizer.eos_token_id,lah=lah,move_to_device=True,max_num_steps=cfg.max_step_per_epoch[epoch],dataloader_test=None,horizon=horizon,gradient_accumulation_steps=gradient_accumulation_steps,num_test_batches=30,print_per_batch=print_every,batch_size=batch_size,tokenizer=tokenizer,max_new_tokens=max_new_tokens,do_sample=True,temp=temp,ddp_rank=ddp_rank,ddp_world_size=ddp_world_size,writer=writer,checkpoint_dir=checkpoint_dir_,past_epoch_steps=sum(cfg.max_step_per_epoch[:epoch]),start_step=start_step,unfreeze_idx=unfreeze_ids[-1],checkpoint_every=cfg.checkpoint_every,eval_every=cfg.eval_every)
+        helpers.pretrain_simerr(model,train_loader,optimizer,scheduler,device,tokenizer.pad_token_id,tokenizer.eos_token_id,dataloader_test=val_loader,lah=lah,move_to_device=True,max_num_steps=cfg.max_step_per_epoch[epoch],dataloader_test=None,horizon=horizon,gradient_accumulation_steps=gradient_accumulation_steps,num_test_batches=30,print_per_batch=print_every,batch_size=batch_size,tokenizer=tokenizer,max_new_tokens=max_new_tokens,do_sample=True,temp=temp,ddp_rank=ddp_rank,ddp_world_size=ddp_world_size,writer=writer,checkpoint_dir=checkpoint_dir_,past_epoch_steps=sum(cfg.max_step_per_epoch[:epoch]),start_step=start_step,unfreeze_idx=unfreeze_ids[-1],checkpoint_every=cfg.checkpoint_every,eval_every=cfg.eval_every,verbose=cfg.verbose)
         if ddp_rank==0:
             print('epoch ended...')
         raw_model=model.module
