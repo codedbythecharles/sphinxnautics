@@ -1,6 +1,5 @@
 # sphinxnautics
-cat <<'EOF' > README.md
-# sphinxnautics-7b: Fine-Tuned Qwen2.5-Coder-7B for Competitive Programming
+# sphinxnautics-7b: Fine-Tuned Qwen2.5-Coder-7B on Codeforces
 
 This repository hosts code and instructions for running and reproducing results with the `sphinxnautics-7b` model — a fine-tuned version of `Qwen2.5-Coder-7B-Instruct` on competitive programming problems using next-token and KL-based distillation strategies.
 
@@ -56,6 +55,46 @@ python3 -m eval_codeforces \
 💡 Note: 
 
 - The --port flag allows you to point the evaluator to a specific vLLM server instance.
-You can run multiple servers on different ports and launch parallel evaluations with different --start_idx and --port values to speed up the process. This is useful when evaluating large numbers of problems (e.g. 1000+).
+You can run multiple servers on different ports and launch parallel evaluations with different --start_idx and --port values to speed up the process. This is useful when evaluating large numbers of problems.
 
-- At the end of evaluation, a .json summary file is automatically saved to the results/ directory. This file contains the full pass@k breakdown, including per-problem outputs and an overall summary.
+- At the end of evaluation, a .json summary file is automatically saved to the disk. This file contains the full pass@k breakdown, including per-problem outputs and an overall summary.
+
+##🏋️ Training
+We provide two ways to train:
+
+(1) Supervised Fine-Tuning (SFT): Trains a model directly on problem descriptions using next-token prediction. Example:
+
+```bash
+CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nproc_per_node=4 train_model.py \
+  --model_name Qwen/Qwen2.5-7B-Instruct \
+  --train_dataset <your_dataset> \
+  --test_dataset <your_test_dataset> \
+  --num_epochs 4 \
+  --max_step_per_epoch [500,1000,1000,1000] \
+  --unfreeze_ids [[1..12],[1..8],[1..4],[1..4]] \
+  --init_max_CL 2048 \
+  --instruct_flag \
+  --with_reasoning \
+  --keep_it_smooth \
+  --do_eval [False,False,False,True] \
+  --experiment_id exp17
+'''
+
+(2) KL-Distillation: Fine-tunes a student model (e.g., Qwen2.5-Coder-7B-Instruct) using outputs from a larger teacher model (e.g., Qwen2.5-Coder-32B-Instruct) to guide learning via KL-divergence loss. Example:
+
+'''bash
+CUDA_VISIBLE_DEVICES=0,1 python train_model_distill.py \
+  --model_name CUDA_VISIBLE_DEVICES=0,1 python train_model_distill.py \
+  --model_name Qwen/Qwen2.5-7B-Instruct\
+  --teacher_name Qwen/Qwen2.5-Coder-32B-Instruct \
+  --train_dataset <your_dataset> \
+  --instruct_flag \
+  --with_reasoning \
+  --num_epochs 1 \
+  --max_step_per_epoch 2000 \
+  --checkpoint_every 500 \
+  --keep_it_smooth
+'''
+
+
+
