@@ -1,5 +1,5 @@
 # sphinxnautics
-# sphinxnautics-7b: Fine-Tuned Qwen2.5-Coder-7B on Codeforces
+# sphinxnautics-7b: Fine-Tuning and Evaluading Qwen2.5-7B-Instruct on Codeforces
 
 This repository hosts code and instructions for running and reproducing results with the `sphinxnautics-7b` model — a fine-tuned version of `Qwen2.5-Coder-7B-Instruct` on competitive programming problems using next-token and KL-based distillation strategies.
 
@@ -97,5 +97,10 @@ CUDA_VISIBLE_DEVICES=0,1 python train_model_distill.py \
   --experiment_id 1
 ```
 
+## ⚠️ Memory Tip for Long-Context Training
+For training runs with long context lengths (e.g., > 8k tokens) and multiple unfrozen layers, CUDA memory fragmentation can cause out-of-memory errors, even when memory appears available.
 
-
+To prevent this, set the following environment variable:
+```bash
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:256
+```
