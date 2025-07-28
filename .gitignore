@@ -34,6 +34,7 @@ logs/
 runs/
 models/
 checkpoint*/
+Qwen2.5*/
 data/
 *.pt
 *.json
