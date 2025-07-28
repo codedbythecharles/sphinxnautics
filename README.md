@@ -18,7 +18,7 @@ pip install -r requirements.txt
 ```
 
 
-##🔥 Run inference with vLLM
+## 🔥 Run inference with vLLM
 
 Serve the SFT model:
 ```bash
