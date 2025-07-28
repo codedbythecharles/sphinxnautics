@@ -62,22 +62,26 @@ You can run multiple servers on different ports and launch parallel evaluations 
 ##🏋️ Training
 We provide two ways to train:
 
-(1) Supervised Fine-Tuning (SFT): Trains a model directly on problem descriptions using next-token prediction. Example:
+(1) Supervised Fine-Tuning (SFT): Trains a model directly on problem descriptions using next-token prediction. To reproduce our SFT model training, run:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nproc_per_node=4 train_model.py \
+export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:256
+
+CUDA_VISIBLE_DEVICES=4,5,6,7 torchrun --nproc_per_node=4 train_model.py \
   --model_name Qwen/Qwen2.5-7B-Instruct \
-  --train_dataset <your_dataset> \
-  --test_dataset <your_test_dataset> \
+  --train_dataset haj1r/sphinxnautics-codeforces-cot-v3 \
+  --test_dataset open-r1/codeforces \
   --num_epochs 4 \
   --max_step_per_epoch [500,1000,1000,1000] \
-  --unfreeze_ids [[1],[1,2],[1,2,3],[1,2,3,4]] \
+  --unfreeze_ids [[1,2,3,4,5,6,7,8,9,10,11,12],[1,2,3,4,5,6,7,8],[1,2,3,4],[1,2,3,4]] \
   --init_max_CL 2048 \
   --instruct_flag \
   --with_reasoning \
-  --keep_it_smooth \
-  --do_eval [False,False,False,True] \
-  --experiment_id 0
+  --eval_bs 1 \
+  --val_sample_per_gpu 16 \
+  --at_k 8 \
+  --eval_temp 0.7 \
+  --keep_it_smooth
 ```
 
 (2) KL-Distillation: Fine-tunes a student model (e.g., Qwen2.5-Coder-7B-Instruct) using outputs from a larger teacher model (e.g., Qwen2.5-Coder-32B-Instruct) to guide learning via KL-divergence loss. Example:
@@ -97,10 +101,3 @@ CUDA_VISIBLE_DEVICES=0,1 python train_model_distill.py \
   --experiment_id 1
 ```
 
-## ⚠️ Memory Tip for Long-Context Training
-For training runs with long context lengths (e.g., > 8k tokens) and multiple unfrozen layers, CUDA memory fragmentation can cause out-of-memory errors, even when memory appears available.
-
-To prevent this, set the following environment variable:
-```bash
-export PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:256
-```
