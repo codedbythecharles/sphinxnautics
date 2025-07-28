@@ -227,7 +227,7 @@ def configure_optimizers(m, weight_decay,print_it=True):
 accelerator = Accelerator()
 
 # Move model and dataloader to the proper device using the accelerator
-def evaluate_loss(model,dataloader,pad_token_id,device,num_test_epochs=1,moveflag=True,print_every=10):
+def evaluate_loss(model,dataloader,pad_token_id,device,num_test_epochs=1,moveflag=True,print_every=100):
     model, dataloader = accelerator.prepare(model, dataloader)
     pad_token_id=pad_token_id
     total_test_steps=0
@@ -251,7 +251,7 @@ def evaluate_loss(model,dataloader,pad_token_id,device,num_test_epochs=1,movefla
 #            print('shape',outputs.loss.item())
             epoch_loss+=outputs.loss.mean().item()
         if idx%print_every==0:
-            print(epoch_loss/total_test_steps)
+            print('avg validation loss:',epoch_loss/total_test_steps)
 #        print(inputs.shape)
     model.train()
     return epoch_loss/total_test_steps
@@ -384,7 +384,7 @@ def distill_simerr(model,teacher,dataloader,optimizer,scheduler,device,pad_token
             head_norm=torch.norm(model.lm_head.weight).detach()
             grad0=model.lm_head.weight.grad
             grad_norm=torch.norm(grad0).detach()
-            if VERBOSE:
+            if VERBOSE and total_steps%print_every==0:
                 print("model.module.lm_head.weight.requires_grad",model.lm_head.weight.requires_grad)
                 print("Gradient norm head:", grad0.norm().item() if grad0 is not None else "None")
                 print('Norm of head',head_norm)

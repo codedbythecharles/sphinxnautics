@@ -1,34 +1,20 @@
+import os
 import json
 import requests
 from tqdm import tqdm
 import subprocess
 import tempfile
-import os
 import re
-import helpers
 import argparse
 from collections import defaultdict
 from datasets import load_dataset
-#codeforces_api_key=10453d6076515f7adb99e27db0745e5eb0cb0188
-#codeforces secret=0945da1bba8a2acdca66f9e0d0c0b6c0c33bf601
+from openai import OpenAI
+import helpers
+import math 
+
 # Configs
 LANGUAGE_ID = 54  # C++ (or use 71 for Python 3, etc.)
 
-#VLLM_ENDPOINT = "http://localhost:8002/v1/chat/completions"  # Change port for different GPUs
-#MODEL_NAME = "meta-llama/Meta-Llama-3.1-8B-Instruct"
-#MODEL_NAME ="Qwen/Qwen2.5-Coder-7B-Instruct"
-#MODEL_NAME ="Qwen/Qwen2.5-Coder-32B-Instruct"
-#MODEL_NAME = "meta-llama/Meta-Llama-3.3-70B-Instruct"
-#MODEL_NAME = "meta-llama/Llama-3.3-70B-Instruct"
-#MODEL_NAME ="meta-llama/CodeLlama-7b-Python-hf"
-#MODEL_NAME ="meta-llama/CodeLlama-34b-Python-hf"
-#MODEL_NAME ="deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct"
-#MODEL_NAME= "deepseek-ai/deepseek-coder-6.7b-instruct"
-#MODE_NAME= "deepseek-ai/deepseek-coder-33b-instruct"
-#MODE_NAME= "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
-#MODE_NAME= "deepseek-ai/DeepSeek-R1-0528-Qwen3-8B"
-#Qwen/Qwen2.5-7B-Instruct
-#"Qwen/Qwen-7B-Instruct"
 
 
 def get_model_name_from_vllm(port: int) -> str:
@@ -50,12 +36,7 @@ def load_problems(split='test',dataset_name='open-r1/codeforces'):
     dataset = load_dataset(dataset_name, split=split)
     return list(dataset)  # Convert to list of dicts
 
-import math
-from openai import OpenAI
 
-
-import requests
-import math
 
 def query_model_new(prompt: dict, k: int, temperature: float = 1.0,
                      endpoint: str = None, return_logprobs: bool = False,
