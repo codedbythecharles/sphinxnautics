@@ -13,7 +13,7 @@ vllm
 #notebook 
 #jupyterlab 
 #ipywidgets
-flash-attn
+#flash-attn
 #faiss_gpu
 #sentence_transformers
 tensorboard
