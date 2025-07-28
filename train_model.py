@@ -47,9 +47,6 @@ if master_process:
     print(f"total desired batch size: {total_batch_size}")
     print(f"=> calculated gradient accumulation steps: {gradient_accumulation_steps}")
 
-writer = SummaryWriter(log_dir="runs/exp16")
-checkpoint_dir = "checkpoints5"
-os.makedirs(checkpoint_dir, exist_ok=True)
 
 
 # ---------- helpers ----------------------------------------------------------
@@ -162,6 +159,9 @@ def main():
  #   parser.add_argument("--val_dataset",      default='codeforces_cot_filtered_truncated_matched_val_v1')
     parser.add_argument("--test_dataset",      default='open-r1/codeforces')
     parser.add_argument("--checkpoint_every", type=int,      default=500)
+    parser.add_argument("--max_CL", type=int,      default=16384)
+    parser.add_argument("--checkpoint_dir", type=str,      default='checkpoints')
+    parser.add_argument("--experiment_id", type=int,      default=1)
     parser.add_argument("--lr_fac", type=float,      default=1)
     parser.add_argument("--init_max_CL", type=int,      default=None)
     parser.add_argument("--split",        default="test")
@@ -190,6 +190,10 @@ def main():
     cfg= cfg_init(parser)   
     if ddp_rank==0 and cfg.verbose:
         print('layer schedules for training',cfg.unfreeze_ids)# each epoch will train the layers specified in the list. The entries are distance from the last layer so [0,1] means layer[-1],layer[-2] will be trained 
+
+    writer = SummaryWriter(log_dir=f"runs/exp{cfg.experiment_id}")
+    checkpoint_dir = cfg.chkpoint_dir
+    os.makedirs(checkpoint_dir, exist_ok=True)
 
     map_loc = f"cuda:{ddp_rank}"# if device_type == "cuda" else "cpu"
     ACCESS_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
@@ -299,9 +303,9 @@ def main():
 #    import code;code.interact(local=locals())
     for epoch in range(start_epoch,cfg.num_epochs):
         tokenized_dataset_train=data_codeforces_cot_train.select(range(total_examples_per_gpu*ddp_world_size)).map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
-            'context_length':min([int(cfg.init_max_CL*2**epoch),16384]),'tokenizer':tokenizer,'truncation':True,'padding':'max_length'})
+            'context_length':min([int(cfg.init_max_CL*2**epoch),cfg.max_CL]),'tokenizer':tokenizer,'truncation':True,'padding':'max_length'})
         tokenized_dataset_val=data_codeforces_cot_val.map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
-            'context_length':min([int(cfg.init_max_CL*2**epoch),16384]),'tokenizer':tokenizer,'truncation':True,'padding':'max_length'})
+            'context_length':min([int(cfg.init_max_CL*2**epoch),cfg.max_CL]),'tokenizer':tokenizer,'truncation':True,'padding':'max_length'})
 #    tokenized_dataset_test=data_codeforces_test.select(range(2**7)).map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
  #           'context_length':8092,'tokenizer':tokenizer})
         collate_fn_pad_partial=partial(helpers.collate_fn_pad,pad_token_id=tokenizer.pad_token_id)
