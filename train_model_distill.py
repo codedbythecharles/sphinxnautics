@@ -20,6 +20,9 @@ assert torch.cuda.is_available(), "for now i think we need CUDA for DDP"
 from hf_evaluation import evaluate_model_on_dataset
 from torch.utils.tensorboard import SummaryWriter
 from typing import Optional, Tuple
+import importlib.util
+use_flash = importlib.util.find_spec("flash_attn") is not None
+
 #torch.set_float32_matmul_precision('high')
 total_batch_size = 2**17 # for a 7B model target 2M per GPT3 paper but we are fine-tuning so it can be less. 
 B = 1 # micro batch size
@@ -147,10 +150,10 @@ def main():
 
     #model_name="deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct"
     device='cuda'
-    teacher = AutoModelForCausalLM.from_pretrained(cfg.teacher_name,token=ACCESS_TOKEN,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2",device_map={"": 1})
+    teacher = AutoModelForCausalLM.from_pretrained(cfg.teacher_name,token=ACCESS_TOKEN,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2" if use_flash else "eager",device_map={"": 1})
     teacher.eval()
     for p in teacher.parameters(): p.requires_grad_(False)
-    model = AutoModelForCausalLM.from_pretrained(cfg.model_name,token=ACCESS_TOKEN,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2",device_map={"": 0})
+    model = AutoModelForCausalLM.from_pretrained(cfg.model_name,token=ACCESS_TOKEN,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2" if use_flash else "eager",device_map={"": 0})
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_name, use_auth_token=ACCESS_TOKEN)
     if tokenizer.pad_token_id is None:
         # Add a new unique padding token

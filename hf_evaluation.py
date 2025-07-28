@@ -14,6 +14,8 @@ from helpers import (
 )
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
+import importlib
+use_flash = importlib.util.find_spec("flash_attn") is not None
 
 def evaluate_model_on_dataset(model, tokenizer, dataset, model_name, device, *,
                                lang='cpp',
@@ -165,13 +167,14 @@ if __name__ == "__main__":
     print('at_k',args.at_k)
     ACCESS_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
 
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_auth_token=access_token,trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_auth_token=ACCESS_TOKEN,trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name,
-        token=access_token,
+        token=ACCESS_TOKEN,
         trust_remote_code=True,
         torch_dtype=torch.bfloat16,
-        device_map="auto"
+        device_map="auto",
+        attn_implementation="flash_attention_2" if use_flash else "eager"
     )
 
     if tokenizer.pad_token_id is None:

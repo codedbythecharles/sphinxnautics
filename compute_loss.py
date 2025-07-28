@@ -19,6 +19,9 @@ assert torch.cuda.is_available(), "for now i think we need CUDA for DDP"
 from hf_evaluation import evaluate_model_on_dataset
 from torch.utils.tensorboard import SummaryWriter
 from typing import Optional, Tuple
+import importlib.util
+use_flash = importlib.util.find_spec("flash_attn") is not None
+
 #torch.set_float32_matmul_precision('high')
 
 #model_name="meta-llama/Meta-Llama-3.1-8B-Instruct"
@@ -32,47 +35,6 @@ B = 1 # micro batch size
 T = 16384 # average sequence length
 gradient_accumulation_steps = total_batch_size // (B * T * 1)
 
-
-"""
-#First Create success ids from json files and save locally
-cd /root/workspace/jsons_train_32B
-python3 extract_success_ids.py --dir .
-
-
-# Convert a dataset (local)
-python3 filter_success_ds.py \
-  --csv success_best_overall.csv \
-  --dataset_in /path/to/dataset_dir \
-  --dataset_out filtered_success_ds
-
-#Dataset from the Hub:
-
-python3 filter_success_ds.py \
-  --csv success_best_overall.csv \
-  --dataset_in your_org/your_dataset \
-  --split train \
-  --dataset_out filtered_success_ds
-
-#Then 
-from datasets import load_from_disk
-ds = load_from_disk("filtered_success_ds")
-print(ds[0]["problem_id"], ds[0]["trials_to_success"])
-
-#now build a has
-python compare_ds.py build \
-  --ref_ds filtered_success_ds \
-  --out_index problem_index_minilm \
-  --ref_out filtered_success_ds_hashed
-
-#and compare a new dataset against the hashed one  
-python comparse_ds.py compare \
-  --index_dir problem_index_minilm \
-  --query_ds new_dataset_dir \
-  --out_ds new_dataset_annotated \
-  --threshold 0.92 \
-  --top_k 10
-
-"""
 writer = SummaryWriter(log_dir="runs/exp8")
 checkpoint_dir = "checkpoints2"
 os.makedirs(checkpoint_dir, exist_ok=True)
@@ -136,7 +98,7 @@ def main():
     ACCESS_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
         
     #model_name="deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct"
-    model = AutoModelForCausalLM.from_pretrained(cfg.model_name,token=ACCESS_TOKEN ,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2",device_map='auto')
+    model = AutoModelForCausalLM.from_pretrained(cfg.model_name,token=ACCESS_TOKEN ,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2" if use_flash else "eager",device_map='auto')
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_name, use_auth_token=ACCESS_TOKEN )
     if tokenizer.pad_token_id is None:
         # Add a new unique padding token

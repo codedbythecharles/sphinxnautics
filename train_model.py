@@ -28,6 +28,8 @@ from collections import defaultdict
 #torch.set_float32_matmul_precision('high')
 import helpers
 from hf_evaluation import evaluate_model_on_dataset
+import importlib
+use_flash = importlib.util.find_spec("flash_attn") is not None
 
 ddp = int(os.environ.get('RANK', -1)) != -1 # is this a ddp run?
 if not torch.distributed.is_initialized():
@@ -181,7 +183,7 @@ def main():
     ACCESS_TOKEN = os.getenv("HUGGING_FACE_HUB_TOKEN")
         
     #model_name="deepseek-ai/DeepSeek-Coder-V2-Lite-Instruct"
-    model = AutoModelForCausalLM.from_pretrained(cfg.model_name,token=ACCESS_TOKEN,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2")
+    model = AutoModelForCausalLM.from_pretrained(cfg.model_name,token=ACCESS_TOKEN,torch_dtype=torch.bfloat16,attn_implementation="flash_attention_2" if use_flash else "eager")
     tokenizer = AutoTokenizer.from_pretrained(cfg.model_name, token=ACCESS_TOKEN)
     if tokenizer.pad_token_id is None:
         # Add a new unique padding token
