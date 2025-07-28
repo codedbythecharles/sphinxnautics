@@ -58,7 +58,7 @@ You can run multiple servers on different ports and launch parallel evaluations 
 
 - At the end of evaluation, a .json summary file is automatically saved to the disk. This file contains the full pass@k breakdown, including per-problem outputs and an overall summary.
 
-##🏋️ Training
+## 🏋️ Training
 We provide two ways to train:
 
 (1) Supervised Fine-Tuning (SFT): Trains a model directly on problem descriptions using next-token prediction. To reproduce our SFT model training, run:
