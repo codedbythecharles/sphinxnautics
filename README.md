@@ -11,3 +11,22 @@ This repository hosts code and instructions for running and reproducing results 
 ```bash
 git clone https://github.com/codedbythecharles/sphinxnautics.git
 cd sphinxnautics
+
+## 🧰 Requirements
+
+```bash
+pip install -r requirements.txt
+
+
+
+##🔥 Run inference with vLLM
+
+Serve the SFT model:
+```bash
+./launch_vllm.sh 12288 1 8000 0 "haj1r/sphinxnautics-7b"
+
+```bash
+Serve the KL‑distilled model:
+./launch_vllm.sh 12288 1 8000 1 "haj1r/sphinxnautics-7b-kl-distilled"
+
+
