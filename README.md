@@ -1,5 +1,4 @@
-# sphinxnautics
-# sphinxnautics-7b: Fine-Tuning and Evaluading Qwen2.5-7B-Instruct on Codeforces
+# sphinxnautics: Fine-Tuning and Evaluating Qwen2.5-7B-Instruct on Codeforces
 
 This repository hosts code and instructions for running and reproducing results with the `sphinxnautics-7b` model — a fine-tuned version of `Qwen2.5-Coder-7B-Instruct` on competitive programming problems using next-token and KL-based distillation strategies.
 
