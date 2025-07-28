@@ -31,14 +31,14 @@ MANIFEST
 
 # My ML-specific ignores
 logs/
-runs/
+#runs/
 models/
 checkpoint*/
 sphixnautics*/
 Qwen2.5*/
 data/
 *.pt
-*.json
+#*.json
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
