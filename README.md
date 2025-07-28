@@ -83,7 +83,7 @@ CUDA_VISIBLE_DEVICES=4,5,6,7 torchrun --nproc_per_node=4 train_model.py \
   --keep_it_smooth
 ```
 
-(2) KL-Distillation: Fine-tunes a student model (e.g., Qwen2.5-Coder-7B-Instruct) using outputs from a larger teacher model (e.g., Qwen2.5-Coder-32B-Instruct) to guide learning via KL-divergence loss. Example:
+(2) KL-Distillation: Fine-tunes a student model (e.g., Qwen2.5-7B-Instruct) using outputs from a larger teacher model (e.g., Qwen2.5-Coder-32B-Instruct) to guide learning via KL-divergence loss. Example:
 
 ```bash
 CUDA_VISIBLE_DEVICES=0,1 python train_model_distill.py \
