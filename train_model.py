@@ -62,10 +62,6 @@ def init_distributed():
     torch.cuda.set_device(local_rank)
     return rank, world_size, local_rank
 
-def shard_dataset(ds, world_size, rank):
-    # contiguous=True keeps ranges, good for load‑latency
-    return ds.shard(num_shards=world_size, index=rank, contiguous=True)
-
 def gather_results(rank_results):
     world_size = dist.get_world_size()
     gathered   = [None] * world_size
@@ -104,18 +100,6 @@ def distributed_eval(ddp_model, val_ds, tokenizer, cfg):
     return local_results
 
         # compute pass@k, dump JSON, etc.
-
-
-def linear_with_min_lr(step, total_steps, warmup_steps, min_factor=0.1):
-    if step < warmup_steps:
-        return float(step) / float(max(1, warmup_steps))
-    progress = float(step - warmup_steps) / float(max(1, total_steps - warmup_steps))
-    return max(min_factor, 1.0 - progress * (1.0 - min_factor))
-import math
-
-def linear_with_floor_via_fake_T(actual_steps: int, min_factor: float, warmup_steps: int = 0):
-    # returns a fake num_training_steps to pass to HF linear scheduler
-    return max(actual_steps + 1, math.ceil((actual_steps - min_factor*warmup_steps) / (1.0 - min_factor)))
         
 
 def sanitize_filename(name):
@@ -156,7 +140,6 @@ def main():
     parser.add_argument("--model_name",   default=model_name)
     parser.add_argument("--verbose",action="store_true")
     parser.add_argument("--train_dataset",      default='haj1r/sphinxnautics-codeforces-cot-v3')
- #   parser.add_argument("--val_dataset",      default='codeforces_cot_filtered_truncated_matched_val_v1')
     parser.add_argument("--test_dataset",      default='open-r1/codeforces')
     parser.add_argument("--checkpoint_every", type=int,      default=500)
     parser.add_argument("--max_CL", type=int,      default=16384)
@@ -180,7 +163,6 @@ def main():
     parser.add_argument("--with_reasoning", action="store_true")
     parser.add_argument("--instruct_flag",  action="store_true")
     #  ─── misc ────────────────────────────────────
-    parser.add_argument("--run_name",     default="run")
     parser.add_argument("--eval_every",   type=int, default=100)
     # add to your arg parser / cfg
     parser.add_argument("--resume_path", type=str, default=None,
@@ -192,7 +174,7 @@ def main():
         print('layer schedules for training',cfg.unfreeze_ids)# each epoch will train the layers specified in the list. The entries are distance from the last layer so [0,1] means layer[-1],layer[-2] will be trained 
 
     writer = SummaryWriter(log_dir=f"runs/exp{cfg.experiment_id}")
-    checkpoint_dir = cfg.chkpoint_dir
+    checkpoint_dir = cfg.checkpoint_dir
     os.makedirs(checkpoint_dir, exist_ok=True)
 
     map_loc = f"cuda:{ddp_rank}"# if device_type == "cuda" else "cpu"
