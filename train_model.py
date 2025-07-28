@@ -321,11 +321,18 @@ def main():
             sampler=sampler,
             collate_fn=dataloader_pretrain.collate_fn,
         )
+        val_sampler = torch.utils.data.distributed.DistributedSampler(
+            dataloader_preval.dataset,
+            num_replicas=ddp_world_size,
+            rank=ddp_rank,
+            shuffle=True,
+            drop_last=True,
+        )
 
         val_loader = DataLoader(
             dataloader_preval.dataset,
             batch_size=B,
-            sampler=sampler,
+            sampler=val_sampler,
             collate_fn=dataloader_preval.collate_fn,
         )
         

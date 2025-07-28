@@ -278,12 +278,12 @@ def distill_simerr(model,teacher,dataloader,optimizer,scheduler,device,pad_token
             optimizer_helper.zero_grad(set_to_none=True)
 
         t0=time.time()
+        if ddp_rank==0:
+            print('-------------',len(dataloader))
         for idx, batch in enumerate(dataloader):
             epoch_steps+=1
             B,T=batch['input_ids'].shape
             num_processed_tokens.append((B*T)*ddp_world_size)
-            if ddp_rank==0:
-                print('-------------',len(dataloader))
             total_steps += 1
             
             if move_to_device:
@@ -485,12 +485,12 @@ def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos
             optimizer_helper.zero_grad(set_to_none=True)
 
         t0=time.time()
+        if ddp_rank==0:
+            print('-------------',len(dataloader))
         for idx, batch in enumerate(dataloader):
             epoch_steps+=1
             B,T=batch['input_ids'].shape
             num_processed_tokens.append((B*T)*ddp_world_size)
-            if ddp_rank==0:
-                print('-------------',len(dataloader))
             total_steps += 1
             
             if move_to_device:
@@ -608,9 +608,8 @@ def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos
             losses.append(loss.mean().item() * gradient_accumulation_steps)
             if (max_num_steps is not None) and (total_steps>=max_num_steps):
                 break
-
             if dataloader_test is not None and total_steps%eval_every==0:
-                loss_eval=evaluate_loss(model,dataloader_test,pad_token_id,device,num_test_epochs=1)
+                loss_eval=torch.tensor(evaluate_loss(model,dataloader_test,pad_token_id,device,num_test_epochs=1),device=device)
                 torch.distributed.all_reduce(loss_eval, op=torch.distributed.ReduceOp.AVG)
                 if ddp_rank==0:
                     print(f"Step {epoch + 1}/{num_epochs}, val Loss: {loss_eval})")#, test loss:{loss_eval}")
@@ -646,13 +645,13 @@ def compute_logprobs(model,dataloader,device,pad_token_id,eos_token_id,num_helpe
         epoch_loss = 0
         loss_local = torch.tensor(0.0, device=device)
 
+        if ddp_rank==0:
+            print('-------------',len(dataloader))
         t0=time.time()
         for idx, batch in enumerate(dataloader):
             epoch_steps+=1
             B,T=batch['input_ids'].shape
             num_processed_tokens.append((B*T)*ddp_world_size)
-            if ddp_rank==0:
-                print('-------------',len(dataloader))
             total_steps += 1
             
             if move_to_device:
