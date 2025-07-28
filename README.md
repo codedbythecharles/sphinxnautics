@@ -71,7 +71,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nproc_per_node=4 train_model.py \
   --test_dataset <your_test_dataset> \
   --num_epochs 4 \
   --max_step_per_epoch [500,1000,1000,1000] \
-  --unfreeze_ids [[1..12],[1..8],[1..4],[1..4]] \
+  --unfreeze_ids [[1],[1,2],[1,2,3],[1,2,3,4]] \
   --init_max_CL 2048 \
   --instruct_flag \
   --with_reasoning \
