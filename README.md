@@ -77,7 +77,7 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nproc_per_node=4 train_model.py \
   --with_reasoning \
   --keep_it_smooth \
   --do_eval [False,False,False,True] \
-  --experiment_id exp17
+  --experiment_id 0
 ```
 
 (2) KL-Distillation: Fine-tunes a student model (e.g., Qwen2.5-Coder-7B-Instruct) using outputs from a larger teacher model (e.g., Qwen2.5-Coder-32B-Instruct) to guide learning via KL-divergence loss. Example:
@@ -94,6 +94,7 @@ CUDA_VISIBLE_DEVICES=0,1 python train_model_distill.py \
   --max_step_per_epoch 2000 \
   --checkpoint_every 500 \
   --keep_it_smooth
+  --experiment_id 1
 ```
 
 
