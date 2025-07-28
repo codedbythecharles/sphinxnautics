@@ -1,0 +1,2737 @@
+[
+  {
+    "problem_id": "852/A",
+    "samples": [
+      {
+        "problem_id": "852/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/A",
+        "sample_id": 2,
+        "passed": 1,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/A",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/A",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/A",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/A",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/A",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/A",
+        "sample_id": 8,
+        "passed": 1,
+        "total": 5,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/B",
+    "samples": [
+      {
+        "problem_id": "852/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "852/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "852/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "852/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "852/B",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "852/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "852/B",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "852/B",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/C",
+    "samples": [
+      {
+        "problem_id": "852/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/C",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/C",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/C",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/C",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/C",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/D",
+    "samples": [
+      {
+        "problem_id": "852/D",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/D",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/D",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/D",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/D",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/D",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/D",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "852/D",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/E",
+    "samples": [
+      {
+        "problem_id": "852/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/E",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/E",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/E",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/E",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/E",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/F",
+    "samples": [
+      {
+        "problem_id": "852/F",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/F",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/F",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/F",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/F",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/F",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/F",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "852/F",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/G",
+    "samples": [
+      {
+        "problem_id": "852/G",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/G",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/G",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/G",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/G",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/G",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/G",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "852/G",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/H",
+    "samples": [
+      {
+        "problem_id": "852/H",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "852/H",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "852/H",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "852/H",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "852/H",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "852/H",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "852/H",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "852/H",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "852/I",
+    "samples": [
+      {
+        "problem_id": "852/I",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      },
+      {
+        "problem_id": "852/I",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      },
+      {
+        "problem_id": "852/I",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      },
+      {
+        "problem_id": "852/I",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      },
+      {
+        "problem_id": "852/I",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      },
+      {
+        "problem_id": "852/I",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      },
+      {
+        "problem_id": "852/I",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      },
+      {
+        "problem_id": "852/I",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 7,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1268/A",
+    "samples": [
+      {
+        "problem_id": "1268/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 173,
+        "success": false
+      },
+      {
+        "problem_id": "1268/A",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 173,
+        "success": false
+      },
+      {
+        "problem_id": "1268/A",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 173,
+        "success": false
+      },
+      {
+        "problem_id": "1268/A",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 173,
+        "success": false
+      },
+      {
+        "problem_id": "1268/A",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 173,
+        "success": false
+      },
+      {
+        "problem_id": "1268/A",
+        "sample_id": 6,
+        "passed": 1,
+        "total": 173,
+        "success": false
+      },
+      {
+        "problem_id": "1268/A",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 173,
+        "success": false
+      },
+      {
+        "problem_id": "1268/A",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 173,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1268/B",
+    "samples": [
+      {
+        "problem_id": "1268/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      },
+      {
+        "problem_id": "1268/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      },
+      {
+        "problem_id": "1268/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      },
+      {
+        "problem_id": "1268/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      },
+      {
+        "problem_id": "1268/B",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      },
+      {
+        "problem_id": "1268/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      },
+      {
+        "problem_id": "1268/B",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      },
+      {
+        "problem_id": "1268/B",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 10,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1268/C",
+    "samples": [
+      {
+        "problem_id": "1268/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1268/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1268/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1268/C",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1268/C",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1268/C",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1268/C",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1268/C",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1268/D",
+    "samples": [
+      {
+        "problem_id": "1268/D",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 56,
+        "success": false
+      },
+      {
+        "problem_id": "1268/D",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 56,
+        "success": false
+      },
+      {
+        "problem_id": "1268/D",
+        "sample_id": 3,
+        "passed": 1,
+        "total": 56,
+        "success": false
+      },
+      {
+        "problem_id": "1268/D",
+        "sample_id": 4,
+        "passed": 1,
+        "total": 56,
+        "success": false
+      },
+      {
+        "problem_id": "1268/D",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 56,
+        "success": false
+      },
+      {
+        "problem_id": "1268/D",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 56,
+        "success": false
+      },
+      {
+        "problem_id": "1268/D",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 56,
+        "success": false
+      },
+      {
+        "problem_id": "1268/D",
+        "sample_id": 8,
+        "passed": 1,
+        "total": 56,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1268/E",
+    "samples": [
+      {
+        "problem_id": "1268/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1268/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1268/E",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1268/E",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1268/E",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1268/E",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1268/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1268/E",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "819/A",
+    "samples": [
+      {
+        "problem_id": "819/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      },
+      {
+        "problem_id": "819/A",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      },
+      {
+        "problem_id": "819/A",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      },
+      {
+        "problem_id": "819/A",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      },
+      {
+        "problem_id": "819/A",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      },
+      {
+        "problem_id": "819/A",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      },
+      {
+        "problem_id": "819/A",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      },
+      {
+        "problem_id": "819/A",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 71,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "819/B",
+    "samples": [
+      {
+        "problem_id": "819/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 47,
+        "success": false
+      },
+      {
+        "problem_id": "819/B",
+        "sample_id": 2,
+        "passed": 1,
+        "total": 47,
+        "success": false
+      },
+      {
+        "problem_id": "819/B",
+        "sample_id": 3,
+        "passed": 1,
+        "total": 47,
+        "success": false
+      },
+      {
+        "problem_id": "819/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 47,
+        "success": false
+      },
+      {
+        "problem_id": "819/B",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 47,
+        "success": false
+      },
+      {
+        "problem_id": "819/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 47,
+        "success": false
+      },
+      {
+        "problem_id": "819/B",
+        "sample_id": 7,
+        "passed": 1,
+        "total": 47,
+        "success": false
+      },
+      {
+        "problem_id": "819/B",
+        "sample_id": 8,
+        "passed": 1,
+        "total": 47,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "819/C",
+    "samples": [
+      {
+        "problem_id": "819/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "819/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "819/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "819/C",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "819/C",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "819/C",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "819/C",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "819/C",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "819/D",
+    "samples": [
+      {
+        "problem_id": "819/D",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      },
+      {
+        "problem_id": "819/D",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      },
+      {
+        "problem_id": "819/D",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      },
+      {
+        "problem_id": "819/D",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      },
+      {
+        "problem_id": "819/D",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      },
+      {
+        "problem_id": "819/D",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      },
+      {
+        "problem_id": "819/D",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      },
+      {
+        "problem_id": "819/D",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 35,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "819/E",
+    "samples": [
+      {
+        "problem_id": "819/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 55,
+        "success": false
+      },
+      {
+        "problem_id": "819/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 55,
+        "success": false
+      },
+      {
+        "problem_id": "819/E",
+        "sample_id": 3,
+        "passed": 1,
+        "total": 55,
+        "success": false
+      },
+      {
+        "problem_id": "819/E",
+        "sample_id": 4,
+        "passed": 1,
+        "total": 55,
+        "success": false
+      },
+      {
+        "problem_id": "819/E",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 55,
+        "success": false
+      },
+      {
+        "problem_id": "819/E",
+        "sample_id": 6,
+        "passed": 1,
+        "total": 55,
+        "success": false
+      },
+      {
+        "problem_id": "819/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 55,
+        "success": false
+      },
+      {
+        "problem_id": "819/E",
+        "sample_id": 8,
+        "passed": 1,
+        "total": 55,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "465/A",
+    "samples": [
+      {
+        "problem_id": "465/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/A",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/A",
+        "sample_id": 3,
+        "passed": 33,
+        "total": 33,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "465/B",
+    "samples": [
+      {
+        "problem_id": "465/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/B",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/B",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "465/B",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1347/A",
+    "samples": [
+      {
+        "problem_id": "1347/A",
+        "sample_id": 1,
+        "passed": 7,
+        "total": 7,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "1347/B",
+    "samples": [
+      {
+        "problem_id": "1347/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/B",
+        "sample_id": 5,
+        "passed": 2,
+        "total": 2,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "1347/C",
+    "samples": [
+      {
+        "problem_id": "1347/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1347/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1347/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1347/C",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 5,
+        "success": false
+      },
+      {
+        "problem_id": "1347/C",
+        "sample_id": 5,
+        "passed": 5,
+        "total": 5,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "1347/D",
+    "samples": [
+      {
+        "problem_id": "1347/D",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/D",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/D",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/D",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/D",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/D",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/D",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1347/D",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1347/E",
+    "samples": [
+      {
+        "problem_id": "1347/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      },
+      {
+        "problem_id": "1347/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      },
+      {
+        "problem_id": "1347/E",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      },
+      {
+        "problem_id": "1347/E",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      },
+      {
+        "problem_id": "1347/E",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      },
+      {
+        "problem_id": "1347/E",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      },
+      {
+        "problem_id": "1347/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      },
+      {
+        "problem_id": "1347/E",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 12,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1223/A",
+    "samples": [
+      {
+        "problem_id": "1223/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      },
+      {
+        "problem_id": "1223/A",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      },
+      {
+        "problem_id": "1223/A",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      },
+      {
+        "problem_id": "1223/A",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      },
+      {
+        "problem_id": "1223/A",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      },
+      {
+        "problem_id": "1223/A",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      },
+      {
+        "problem_id": "1223/A",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      },
+      {
+        "problem_id": "1223/A",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 11,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1223/B",
+    "samples": [
+      {
+        "problem_id": "1223/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/B",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 1,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "1223/C",
+    "samples": [
+      {
+        "problem_id": "1223/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/C",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/C",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/C",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/C",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/C",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1223/D",
+    "samples": [
+      {
+        "problem_id": "1223/D",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/D",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/D",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/D",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/D",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/D",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/D",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/D",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1223/E",
+    "samples": [
+      {
+        "problem_id": "1223/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/E",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/E",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/E",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/E",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1223/E",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1223/F",
+    "samples": [
+      {
+        "problem_id": "1223/F",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/F",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/F",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/F",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/F",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/F",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/F",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1223/F",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1223/G",
+    "samples": [
+      {
+        "problem_id": "1223/G",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 15,
+        "success": false
+      },
+      {
+        "problem_id": "1223/G",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 15,
+        "success": false
+      },
+      {
+        "problem_id": "1223/G",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 15,
+        "success": false
+      },
+      {
+        "problem_id": "1223/G",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 15,
+        "success": false
+      },
+      {
+        "problem_id": "1223/G",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 15,
+        "success": false
+      },
+      {
+        "problem_id": "1223/G",
+        "sample_id": 6,
+        "passed": 1,
+        "total": 15,
+        "success": false
+      },
+      {
+        "problem_id": "1223/G",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 15,
+        "success": false
+      },
+      {
+        "problem_id": "1223/G",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 15,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "501/A",
+    "samples": [
+      {
+        "problem_id": "501/A",
+        "sample_id": 1,
+        "passed": 40,
+        "total": 40,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "501/B",
+    "samples": [
+      {
+        "problem_id": "501/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      },
+      {
+        "problem_id": "501/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      },
+      {
+        "problem_id": "501/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      },
+      {
+        "problem_id": "501/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      },
+      {
+        "problem_id": "501/B",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      },
+      {
+        "problem_id": "501/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      },
+      {
+        "problem_id": "501/B",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      },
+      {
+        "problem_id": "501/B",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 9,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "501/C",
+    "samples": [
+      {
+        "problem_id": "501/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "501/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "501/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "501/C",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "501/C",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "501/C",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "501/C",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 17,
+        "success": false
+      },
+      {
+        "problem_id": "501/C",
+        "sample_id": 8,
+        "passed": 1,
+        "total": 17,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "501/D",
+    "samples": [
+      {
+        "problem_id": "501/D",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      },
+      {
+        "problem_id": "501/D",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      },
+      {
+        "problem_id": "501/D",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      },
+      {
+        "problem_id": "501/D",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      },
+      {
+        "problem_id": "501/D",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      },
+      {
+        "problem_id": "501/D",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      },
+      {
+        "problem_id": "501/D",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      },
+      {
+        "problem_id": "501/D",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 22,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "501/E",
+    "samples": [
+      {
+        "problem_id": "501/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "501/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "501/E",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "501/E",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "501/E",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "501/E",
+        "sample_id": 6,
+        "passed": 1,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "501/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      },
+      {
+        "problem_id": "501/E",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 18,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "139/A",
+    "samples": [
+      {
+        "problem_id": "139/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 49,
+        "success": false
+      },
+      {
+        "problem_id": "139/A",
+        "sample_id": 2,
+        "passed": 1,
+        "total": 49,
+        "success": false
+      },
+      {
+        "problem_id": "139/A",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 49,
+        "success": false
+      },
+      {
+        "problem_id": "139/A",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 49,
+        "success": false
+      },
+      {
+        "problem_id": "139/A",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 49,
+        "success": false
+      },
+      {
+        "problem_id": "139/A",
+        "sample_id": 6,
+        "passed": 1,
+        "total": 49,
+        "success": false
+      },
+      {
+        "problem_id": "139/A",
+        "sample_id": 7,
+        "passed": 49,
+        "total": 49,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "139/B",
+    "samples": [
+      {
+        "problem_id": "139/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      },
+      {
+        "problem_id": "139/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      },
+      {
+        "problem_id": "139/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      },
+      {
+        "problem_id": "139/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      },
+      {
+        "problem_id": "139/B",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      },
+      {
+        "problem_id": "139/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      },
+      {
+        "problem_id": "139/B",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      },
+      {
+        "problem_id": "139/B",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 13,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "295/A",
+    "samples": [
+      {
+        "problem_id": "295/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      },
+      {
+        "problem_id": "295/A",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      },
+      {
+        "problem_id": "295/A",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      },
+      {
+        "problem_id": "295/A",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      },
+      {
+        "problem_id": "295/A",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      },
+      {
+        "problem_id": "295/A",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      },
+      {
+        "problem_id": "295/A",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      },
+      {
+        "problem_id": "295/A",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 4,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "295/B",
+    "samples": [
+      {
+        "problem_id": "295/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "295/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "295/B",
+        "sample_id": 3,
+        "passed": 1,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "295/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "295/B",
+        "sample_id": 5,
+        "passed": 1,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "295/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "295/B",
+        "sample_id": 7,
+        "passed": 1,
+        "total": 6,
+        "success": false
+      },
+      {
+        "problem_id": "295/B",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 6,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "295/C",
+    "samples": [
+      {
+        "problem_id": "295/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      },
+      {
+        "problem_id": "295/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      },
+      {
+        "problem_id": "295/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      },
+      {
+        "problem_id": "295/C",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      },
+      {
+        "problem_id": "295/C",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      },
+      {
+        "problem_id": "295/C",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      },
+      {
+        "problem_id": "295/C",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      },
+      {
+        "problem_id": "295/C",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 44,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "295/D",
+    "samples": [
+      {
+        "problem_id": "295/D",
+        "sample_id": 1,
+        "passed": 1,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "295/D",
+        "sample_id": 2,
+        "passed": 1,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "295/D",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "295/D",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "295/D",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "295/D",
+        "sample_id": 6,
+        "passed": 1,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "295/D",
+        "sample_id": 7,
+        "passed": 1,
+        "total": 33,
+        "success": false
+      },
+      {
+        "problem_id": "295/D",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 33,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "295/E",
+    "samples": [
+      {
+        "problem_id": "295/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "295/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "295/E",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "295/E",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "295/E",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "295/E",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "295/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "295/E",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1980/A",
+    "samples": [
+      {
+        "problem_id": "1980/A",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 3,
+        "success": false
+      },
+      {
+        "problem_id": "1980/A",
+        "sample_id": 2,
+        "passed": 3,
+        "total": 3,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "1980/B",
+    "samples": [
+      {
+        "problem_id": "1980/B",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/B",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/B",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/B",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/B",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/B",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/B",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/B",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      }
+    ]
+  },
+  {
+    "problem_id": "1980/C",
+    "samples": [
+      {
+        "problem_id": "1980/C",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1980/C",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1980/C",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1980/C",
+        "sample_id": 4,
+        "passed": 1,
+        "total": 1,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "1980/D",
+    "samples": [
+      {
+        "problem_id": "1980/D",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 1,
+        "success": false
+      },
+      {
+        "problem_id": "1980/D",
+        "sample_id": 2,
+        "passed": 1,
+        "total": 1,
+        "success": true
+      }
+    ]
+  },
+  {
+    "problem_id": "1980/E",
+    "samples": [
+      {
+        "problem_id": "1980/E",
+        "sample_id": 1,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/E",
+        "sample_id": 2,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/E",
+        "sample_id": 3,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/E",
+        "sample_id": 4,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/E",
+        "sample_id": 5,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/E",
+        "sample_id": 6,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/E",
+        "sample_id": 7,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      },
+      {
+        "problem_id": "1980/E",
+        "sample_id": 8,
+        "passed": 0,
+        "total": 2,
+        "success": false
+      }
+    ]
+  }
+]
