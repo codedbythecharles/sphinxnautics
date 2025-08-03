@@ -11,6 +11,8 @@ from datasets import load_dataset
 from openai import OpenAI
 import helpers
 import math 
+from config_utils import load_config, select, _normalize_sft
+from log_utils import init_logger
 
 # Configs
 LANGUAGE_ID = 54  # C++ (or use 71 for Python 3, etc.)
@@ -151,39 +153,51 @@ def query_model(prompt: str, k: int,temperature:float=1.0, endpoint: str = None)
 
 def main():
     print('hello!')
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--at_k', type=int, default=1, help='Number of completions to use for pass@k evaluation')
-    parser.add_argument('--model_name', type=str, default=None)
-    parser.add_argument('--lang', type=str, default='cpp')
-    parser.add_argument('--split', type=str, default='test')
-    parser.add_argument('--dataset', type=str, default='open-r1/codeforces')
+#    parser = argparse.ArgumentParser()
+#    parser.add_argument('--at_k', type=int, default=1, help='Number of completions to use for pass@k evaluation')
+ #   parser.add_argument('--model_name', type=str, default=None)
+ #   parser.add_argument('--lang', type=str, default='cpp')
+ #   parser.add_argument('--split', type=str, default='test')
+ #   parser.add_argument('--dataset', type=str, default='open-r1/codeforces')
     #parser.add_argument('--ports', type=lambda s: list(map(int, s.split(','))), default=[8000])
-    parser.add_argument('--port', type=str, default="8000", help='Comma-separated list of ports for vLLM servers')
-    parser.add_argument('--max_problems', type=int, default=10)
-    parser.add_argument('--start_idx', type=int, default=0)
-    parser.add_argument('--temperature', type=float, default=0.8, help='Sampling temperature for model generation')
-    parser.add_argument('--with_reasoning', dest='with_reasoning', action='store_true', help='Include reasoning in the prompt')
-    parser.add_argument('--no_reasoning', dest='with_reasoning', action='store_false', help='Exclude reasoning in the prompt')
-    parser.set_defaults(with_reasoning=True)
+ #   parser.add_argument('--port', type=str, default="8000", help='Comma-separated list of ports for vLLM servers')
+ #   parser.add_argument('--max_problems', type=int, default=10)
+ #   parser.add_argument('--start_idx', type=int, default=0)
+ #   parser.add_argument('--temperature', type=float, default=0.8, help='Sampling temperature for model generation')
+ #   parser.add_argument('--with_reasoning', dest='with_reasoning', action='store_true', help='Include reasoning in the prompt')
+ #   parser.add_argument('--no_reasoning', dest='with_reasoning', action='store_false', help='Exclude reasoning in the prompt')
+#    parser.set_defaults(with_reasoning=True)
 
-    args = parser.parse_args()
+    cfg  = load_config()         # parses CLI
+    logger = init_logger(cfg.logging.level,
+                         cfg.experiment.output_dir,
+                         rank=int(os.getenv("RANK", "0")))
+    tokcfg =select(cfg, "tokenizer")
+    args  = select(cfg, "eval")    # task block
+
+#    args = parser.parse_args()
     problems = load_problems(args.split,args.dataset)
     dataset_name=args.dataset.split('/')[-1]
-    port_list = [int(p.strip()) for p in args.port.split(",")]
-    print(f"🔧 Using ports: {port_list}")
-    print(f"🔧 Language: {args.lang}")
+    if isinstance(args.port, int):
+        port_list = [args.port]
+    elif isinstance(args.port, str):
+        port_list = [int(p.strip()) for p in args.port.split(",")]
+#    port_list = [int(p.strip()) for p in args.port.split(",")]
+    logger.info(f"🔧 Using ports: {port_list}")
+    logger.info(f"🔧 Language: {cfg.lang}")
+    logger.info(f"🔧 Reasoning: {args.with_reasoning}")
     problems = problems[args.start_idx:args.start_idx+args.max_problems]
 
     global MODEL_NAME
-    MODEL_NAME = args.model_name or get_model_name_from_vllm(port_list[0])
-    print(f"🔧 Using model: {MODEL_NAME} Dataset: {args.dataset}")
+    MODEL_NAME = get_model_name_from_vllm(port_list[0])
+    logger.info(f"🔧 Using model: {MODEL_NAME} Dataset: {args.dataset}")
 
     from concurrent.futures import ThreadPoolExecutor, as_completed
     import itertools
 
     port_cycle = itertools.cycle(port_list)
     def make_model(port):
-        print('port is',port)
+        logger.info('port is',port)
         endpoint = f"http://localhost:{port}/v1/chat/completions"
         return lambda prompt, k=args.at_k, temperature=args.temperature: query_model(
             prompt, k=k, temperature=temperature, endpoint=endpoint)
@@ -191,9 +205,9 @@ def main():
     def evaluate_single(problem, port):
         try:
             model = make_model(port)
-            return helpers.evaluate_problem(problem, model, with_reasoning=args.with_reasoning, k=args.at_k, temperature=args.temperature,lang=args.lang)
+            return helpers.evaluate_problem(problem, model, with_reasoning=args.with_reasoning, k=args.at_k, temperature=args.temperature,lang=cfg.lang)
         except Exception as e:
-            print(f"❌ Error evaluating problem {problem.get('id', '???')} on port {port}: {e}")
+            logger.info(f"❌ Error evaluating problem {problem.get('id', '???')} on port {port}: {e}")
             return None
 
     results = []
@@ -210,13 +224,13 @@ def main():
     # Summary
     total = len(results)
     solved = sum(1 for r in results if any(sample['success'] for sample in r['samples']))
-    print(f"\n✅ Solved {solved}/{total} problems.")
-    print(f"🔧 Using ports: {port_list}")
-    print(f"🔧 Using model: {MODEL_NAME} Dataset: {args.dataset}")
+    logger.info(f"\n✅ Solved {solved}/{total} problems.")
+    logger.info(f"🔧 Using ports: {port_list}")
+    logger.info(f"🔧 Using model: {MODEL_NAME} Dataset: {args.dataset}")
 
     sanitized_model_name = helpers.sanitize_filename(MODEL_NAME.split("/")[-1])
 #    filename = f"{sanitized_model_name}_results_atk{args.at_k}"
-    filename = f"{sanitized_model_name}_{dataset_name}_{args.split}_{args.lang}_atk{args.at_k}_sidx_{args.start_idx}_n{args.max_problems}_results"
+    filename = f"{sanitized_model_name}_{dataset_name}_{args.split}_{cfg.lang}_atk{args.at_k}_sidx_{args.start_idx}_n{args.max_problems}_results"
 
     if args.with_reasoning:
         filename += "_with_reasoning"
@@ -233,10 +247,10 @@ def main():
             for k in range(success_at, args.at_k + 1):
                 pass_at_k[k] += 1
 
-    print("\n📊 Cumulative Pass@k Results:")
+    logger.info("\n📊 Cumulative Pass@k Results:")
     for k in range(1, args.at_k + 1):
         count = pass_at_k.get(k, 0)
-        print(f"  ✅ Pass@{k}: {count}/{len(results)} ({count / len(results) * 100:.1f}%)")
+        logger.info(f"  ✅ Pass@{k}: {count}/{len(results)} ({count / len(results) * 100:.1f}%)")
 
     with open(filename_summary, "w") as f:
         json.dump({
@@ -244,6 +258,6 @@ def main():
             "total": len(results)
         }, f, indent=2)
 
-    print(f"\n📝 Summary written to {filename_summary}")
+    logger.info(f"\n📝 Summary written to {filename_summary}")
 if __name__ == "__main__":
     main()

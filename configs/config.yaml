@@ -1,7 +1,6 @@
 # config.yaml  (only the task-specific blocks changed)
 
 train_dataset: haj1r/sphinxnautics-codeforces-cot-v3
-test_dataset:   open-r1/codeforces
 lang:          cpp
 resume_path: null
 dist_backend: fsdp
@@ -66,9 +65,12 @@ distill:
 eval:
   at_k:          16
   eval_bs:       2
-  temp:          0.7
+  temperature:   0.7
+  start_idx:     0
+  max_problems:  1000
   with_reasoning: true
   val_sample_per_gpu: 16
+  dataset:   open-r1/codeforces
   split:         test        # dev / test
   port:          8000        # vLLM server
 

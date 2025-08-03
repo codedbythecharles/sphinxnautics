@@ -233,7 +233,6 @@ def main():
     logger = init_logger(cfg.logging.level,
                          cfg.experiment.output_dir,
                          rank=int(os.getenv("RANK", "0")))
-    logger.info("Config loaded: %s", cfg)
     sft  = select(cfg, "sft")    # task block
     learning  = select(cfg, "learning")    # task block
     tokcfg =select(cfg, "tokenizer")
@@ -318,7 +317,7 @@ def main():
     data_codeforces_cot_val = load_dataset(cfg.train_dataset,split='validation')
     #prepaer the dataset for end to end testing
     test_ds_full = load_dataset(cfg.test_dataset, split="test").select(range(sft.val_sample_per_gpu*ddp_world_size))
-    logger.debug(f"full ds len {len(test_ds_full)} ddp_rank {ddp_rank} ddp_worldsize {ddp_world_size}")    
+    logger.info(f"full ds len {len(test_ds_full)} ddp_rank {ddp_rank} ddp_worldsize {ddp_world_size}")    
 
 #load_from_disk("codeforces_cot_filtered")
     
@@ -452,16 +451,15 @@ def main():
 
         logger.info(f"backend: {cfg.dist_backend}")
         model = wrapper(raw_model, cfg.dist_backend)
+        raw_model = model.module if cfg.dist_backend=='ddp' else model
         if sft.enable_grad_chkpt:
-            model.module.gradient_checkpointing_enable()
+            raw_model.gradient_checkpointing_enable()
         filename = f"{sanitized_model_name}/{cfg.train_dataset}/epoch_{epoch}"
         checkpoint_dir_=checkpoint_dir+'/'+filename
         if ddp_rank==0:
             os.makedirs(checkpoint_dir_, exist_ok=True)
         helpers.pretrain_simerr(model,train_loader,optimizer,scheduler,device,tokenizer.pad_token_id,tokenizer.eos_token_id,dataloader_test=val_loader,lah=lah,move_to_device=True,max_num_steps=sft.max_step_per_epoch[epoch],horizon=horizon,gradient_accumulation_steps=gradient_accumulation_steps,num_test_batches=30,print_per_batch=print_every,batch_size=batch_size,tokenizer=tokenizer,max_new_tokens=max_new_tokens,do_sample=True,temp=temp,ddp_rank=ddp_rank,ddp_world_size=ddp_world_size,writer=writer,checkpoint_dir=checkpoint_dir_,past_epoch_steps=sum(sft.max_step_per_epoch[:epoch]),start_step=start_step,unfreeze_idx=unfreeze_ids[-1],checkpoint_every=sft.checkpoint_every,eval_every=sft.eval_every)
-        import code;code.interact(local=locals())
-        if ddp_rank==0:
-            print('epoch ended...')
+        logger.info('epoch ended...')
 #        raw_model=model.module
         raw_model = model.module if cfg.dist_backend == "ddp" else model
         start_step=0
@@ -481,7 +479,7 @@ def main():
                             for k in range(success_at, cfg.at_k + 1):
                                 pass_at_k[k] += 1
 
-                    print(f"\n📊 Evaluation Results on split={cfg.split} ({total} problems):")
+                    logger.info(f"\n📊 Evaluation Results on split={cfg.split} ({total} problems):")
                     for k in range(1, cfg.at_k + 1):
                         count = pass_at_k.get(k, 0)
                         print(f"  ✅ Pass@{k}: {count}/{total} ({count / total * 100:.2f}%)")
@@ -491,14 +489,14 @@ def main():
                         json.dump(all_results, f, indent=2)
     #                total_successes= sum(pass_at_k.get(k, 0) for k in range(1, cfg.at_k + 1))
                     total_successes= pass_at_k.get(cfg.at_k, 0)# for k in range(1, cfg.at_k + 1))
-                    print(f"Total successes so far: {total_successes}")
+                    logger.info(f"Total successes so far: {total_successes}")
                     accuracy.append(total_successes/total)
                     series = {f"@{k}": pass_at_k.get(k, 0) / total for k in range(1, cfg.at_k + 1)}
 
                     writer.add_scalars("Eval/Pass", series, epoch)                
                     #writer.add_scalar("Acc/Eval", total_successes/total, epoch)
 
-    print(accuracy)   
+    logger.info(accuracy)   
         
     destroy_process_group()
     
