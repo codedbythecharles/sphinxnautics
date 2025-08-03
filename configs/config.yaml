@@ -1,0 +1,75 @@
+# config.yaml  (only the task-specific blocks changed)
+
+train_dataset: haj1r/sphinxnautics-codeforces-cot-v3
+test_dataset:   open-r1/codeforces
+lang:          cpp
+init_max_CL:   2048
+max_CL:        16384
+resume_path: null
+max_lr:        4e-5
+
+experiment:
+  name: sphinxnautics
+  output_dir: checkpoints/
+  seed: 42
+  id : 1
+
+model:
+  name: Qwen/Qwen2.5-7B-Instruct
+
+teacher:
+  name: Qwen/Qwen2.5-Coder-32B-Instruct   # used only by distill / RL
+
+
+# ──────────────────────────────────────────────────────────
+# SFT / Supervised trainer
+sft:
+  num_epochs:          4
+  max_step_per_epoch:  [500, 1000, 1000, 1000]
+  unfreeze_ids:        [[1,2,3,4,5,6,7,8,9,10,11,12],
+                        [1,2,3,4,5,6,7,8],
+                        [1,2,3,4],
+                        [1,2,3,4]]
+  total_batch_tokens:  131072 #      # 2**21
+  micro_batch_size:    1
+  keep_it_smooth:      true
+  checkpoint_every:    500
+  eval_every:          1000
+  print_every:         25
+  enable_grad_chkpt:   True
+  lr_init_adjust_fac:  1 #to scale initial learning rate up or down 
+  lr_final_decay_fac:  0.25 #final_lr decay:relevant when using a decay schedule
+  weight_decay:        0.01 
+  val_sample_per_gpu:  16
+  keep_it_smooth:      True
+  do_eval:             False
+
+# Distillation / RL trainer
+distill:
+  num_epochs:          1
+  max_step_per_epoch:  2000
+  total_batch_tokens:  1048576
+  micro_batch_size:    1
+  activate_rl:         true
+  reverse_kl:          false
+  checkpoint_every:    500
+  print_every:         25
+  enable_grad_chkpt:   True
+  lr_init_adjust_fac:  1 #to scale initial learning rate up or down 
+  lr_final_decay_fac:  0.25 #final_lr decay:relevant when using a decay schedule 
+  weight_decay:        0.01 
+  keep_it_smooth:      True
+  do_eval:             False
+
+# Offline evaluation (eval_codeforces.py, compute_loss.py, etc.)
+eval:
+  at_k:          16
+  eval_bs:       2
+  temp:          0.7
+  with_reasoning: true
+  val_sample_per_gpu: 16
+  split:         test        # dev / test
+  port:          8000        # vLLM server
+
+logging:
+  level: INFO #values: DEBUG <INFO < WARNING < ERROR < CRITICAL
