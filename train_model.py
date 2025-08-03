@@ -32,6 +32,8 @@ import importlib
 from config_utils import load_config, select, _normalize_sft
 from log_utils import init_logger
 import yaml
+from pathlib import Path
+from argparse import Namespace, ArgumentParser
 
 use_flash = importlib.util.find_spec("flash_attn") is not None
 
@@ -49,6 +51,28 @@ target_batch_tokens = 2**20 # for a 7B model target 2M per GPT3 paper but we are
 B = 1 #  batch size for dataloaders
 T = 16384 # maximum sequence length
 
+
+# utils/save_cfg.py
+
+def _ns_to_dict(ns: Namespace):
+    """Recursively turn argparse.Namespace / DotDict into plain dict."""
+    out = {}
+    for k, v in vars(ns).items():
+        if isinstance(v, Namespace):
+            out[k] = _ns_to_dict(v)
+        else:
+            out[k] = v
+    return out
+
+def save_cfg(cfg: Namespace, *paths):
+    cfg_dict = _ns_to_dict(cfg)
+    for p in paths:
+        p = Path(p)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        if p.suffix == ".json":
+            p.write_text(json.dumps(cfg_dict, indent=2))
+        else:  # default YAML
+            p.write_text(yaml.dump(cfg_dict, sort_keys=False))
 
 
 # ---------- helpers ----------------------------------------------------------
@@ -102,6 +126,37 @@ def distributed_eval(ddp_model, val_ds, tokenizer, cfg):
     return local_results
 
         # compute pass@k, dump JSON, etc.
+
+# ─────────────────────────────────────────────────────────────
+def wrapper(raw_model: torch.nn.Module, backend: str):
+    if backend == "ddp":
+        from torch.nn.parallel import DistributedDataParallel as DDP
+        return DDP(raw_model, device_ids=[torch.cuda.current_device()])
+
+    elif backend == "fsdp":
+        from functools import partial
+        from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, MixedPrecision
+        from torch.distributed.fsdp.wrap import size_based_auto_wrap_policy
+        from torch.distributed.fsdp.fully_sharded_data_parallel import CPUOffload
+
+        # build the callable policy ← **partial(...)** is required
+        auto_wrap_policy = partial(size_based_auto_wrap_policy, min_num_params=1e8)
+
+        mp = MixedPrecision(param_dtype=torch.bfloat16,
+                            reduce_dtype=torch.bfloat16,
+                            buffer_dtype=torch.bfloat16)
+
+        return FSDP(
+            raw_model,
+            auto_wrap_policy=auto_wrap_policy,
+            mixed_precision=mp,
+            use_orig_params=True,
+            device_id=torch.cuda.current_device(),
+            cpu_offload=CPUOffload(offload_params=False),
+        )
+    else:
+        raise ValueError(f"Unknown backend {backend}")
+# ─────────────────────────────────────────────────────────────
         
 
 def sanitize_filename(name):
@@ -134,6 +189,7 @@ def cfg_init(parser):
         cfg.init_max_CL=16384
             
     return cfg
+
         
 def main():
     """
@@ -179,7 +235,16 @@ def main():
                          rank=int(os.getenv("RANK", "0")))
     logger.info("Config loaded: %s", cfg)
     sft  = select(cfg, "sft")    # task block
+    learning  = select(cfg, "learning")    # task block
+    tokcfg =select(cfg, "tokenizer")
     _normalize_sft(sft)
+
+    
+    # saving configs to run and chekpoint folders for reproduciblity
+    run_dir = Path(f"runs/exp{cfg.experiment.id}")
+    ckpt_dir = Path(cfg.experiment.output_dir)
+    save_cfg(cfg, run_dir/"config_used.yaml", ckpt_dir/"config_used.yaml")
+    
 #    print("▶ unfreeze_ids elem 0 type:", type(sft.unfreeze_ids),type(sft.unfreeze_ids[0][0]))
 #    import code;code.interact(local=locals())
 
@@ -234,12 +299,12 @@ def main():
     print_every=10
         
    # optimize!
-    weight_decay=sft.weight_decay
+    weight_decay=learning.weight_decay
     use_fused=True
     num_warmup_steps=0
-    max_lr=float(cfg.max_lr)*(sft.total_batch_tokens/(target_batch_tokens))*sft.lr_init_adjust_fac
+    max_lr=float(learning.max_lr)*(sft.total_batch_tokens/(target_batch_tokens))*learning.lr_init_adjust_fac
     logger.info(f'max learning rate: {max_lr}')
-    final_lr=max_lr*sft.lr_final_decay_fac
+    final_lr=max_lr*learning.lr_final_decay_fac
         
 
     device_type = "cuda" if device.startswith("cuda") else "cpu"
@@ -301,12 +366,11 @@ def main():
     accuracy=[]
 #    import code;code.interact(local=locals())
     for epoch in range(start_epoch,sft.num_epochs):
-        print("▶ unfreeze_ids type:", type(sft.unfreeze_ids))
-        print("▶ unfreeze_ids elem 0 type:", type(sft.unfreeze_ids[0]),type(sft.unfreeze_ids[0][0]))
+        print("▶ unfreeze_ids type:", type(sft.unfreeze_ids),'layers',sft.unfreeze_ids)
         tokenized_dataset_train=data_codeforces_cot_train.select(range(total_examples_per_gpu*ddp_world_size)).map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
-            'context_length':min([int(cfg.init_max_CL*2**epoch),cfg.max_CL]),'tokenizer':tokenizer,'truncation':True,'padding':'max_length'})
+            'context_length':min([int(tokcfg.init_max_CL*2**epoch),tokcfg.max_CL]),'tokenizer':tokenizer,'truncation':tokcfg.truncation,'padding':tokcfg.padding})
         tokenized_dataset_val=data_codeforces_cot_val.map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
-            'context_length':min([int(cfg.init_max_CL*2**epoch),cfg.max_CL]),'tokenizer':tokenizer,'truncation':True,'padding':'max_length'})
+            'context_length':min([int(tokcfg.init_max_CL*2**epoch),tokcfg.max_CL]),'tokenizer':tokenizer,'truncation':tokcfg.truncation,'padding':tokcfg.padding})
 #    tokenized_dataset_test=data_codeforces_test.select(range(2**7)).map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
  #           'context_length':8092,'tokenizer':tokenizer})
         collate_fn_pad_partial=partial(helpers.collate_fn_pad,pad_token_id=tokenizer.pad_token_id)
@@ -347,22 +411,26 @@ def main():
         
         
         unfreeze_ids=sft.unfreeze_ids[epoch]
-        for param in raw_model.parameters():
-            param.requires_grad = False
-    #    print(model.model.embed_tokens.weight.requires_grad)
-        if train_head:
-            raw_model.lm_head.weight.requires_grad=True
-        if train_embedder:
-            raw_model.model.embed_tokens.weight.requires_grad=True
-        for idx in unfreeze_ids:
-            print('---------------------------',type(idx))
-            if idx>0:
-                for param in raw_model.model.layers[-idx].parameters():
-                    param.requires_grad = True
+        if unfreeze_ids:            
+            for param in raw_model.parameters():
+                param.requires_grad = False
+        #    print(model.model.embed_tokens.weight.requires_grad)
+            if train_head:
+                raw_model.lm_head.weight.requires_grad=True
+            if train_embedder:
+                raw_model.model.embed_tokens.weight.requires_grad=True
+            for idx in unfreeze_ids:
+                if idx>0:
+                    for param in raw_model.model.layers[-idx].parameters():
+                        param.requires_grad = True
+            num_trainable_layers=len(unfreeze_ids)
+        else:
+            num_trainable_layers=len(raw_model.model.layers)
+            unfreeze_ids=list(range(-1, -num_trainable_layers - 1, -1))
         if not keep_opt_stat:
             adjusted_lr_fac=1.0
-            if sft.keep_it_smooth:
-                adjusted_lr_fac=1/len(unfreeze_ids)*2
+            if learning.keep_it_smooth:
+                adjusted_lr_fac=1/num_trainable_layers*2
             optim_groups=helpers.configure_optimizers(raw_model,weight_decay,print_it=False)
             optimizer=torch.optim.AdamW(optim_groups,lr=max([max_lr*adjusted_lr_fac,final_lr*1.1]),fused=use_fused) 
             scheduler = get_polynomial_decay_schedule_with_warmup(
@@ -372,17 +440,20 @@ def main():
                 lr_end=final_lr,
                 power=1.0,   # linear
             )#    scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=num_warmup_steps, num_training_steps=fake_T)
-            if sft.keep_it_smooth:
+            if learning.keep_it_smooth:
                 scheduler.last_epoch=start_step-1
                 scheduler.step()
 
         if ddp_rank==0:
-            print('unfrozen layers',unfreeze_ids)
-            print(start_step,start_epoch,loaded_path)
+            logger.info(f'unfrozen layers {unfreeze_ids}')
+            logger.info(f'start step {start_step} start epoch {start_epoch} loaded_path {loaded_path}')
             total_opt_param = sum(p.numel() for p in model.parameters() if p.requires_grad)
-            print("total optimizable parameters",total_opt_param/1e9,'B')
-        model=DDP(raw_model,device_ids=[ddp_rank])
-        model.module.gradient_checkpointing_enable()
+            logger.info(f"total optimizable parameters {total_opt_param/1e9} B")
+
+        logger.info(f"backend: {cfg.dist_backend}")
+        model = wrapper(raw_model, cfg.dist_backend)
+        if sft.enable_grad_chkpt:
+            model.module.gradient_checkpointing_enable()
         filename = f"{sanitized_model_name}/{cfg.train_dataset}/epoch_{epoch}"
         checkpoint_dir_=checkpoint_dir+'/'+filename
         if ddp_rank==0:
@@ -391,7 +462,8 @@ def main():
         import code;code.interact(local=locals())
         if ddp_rank==0:
             print('epoch ended...')
-        raw_model=model.module
+#        raw_model=model.module
+        raw_model = model.module if cfg.dist_backend == "ddp" else model
         start_step=0
         keep_opt_stat=False
         do_eval=sft.do_eval[epoch]

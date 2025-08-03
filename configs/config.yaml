@@ -3,16 +3,27 @@
 train_dataset: haj1r/sphinxnautics-codeforces-cot-v3
 test_dataset:   open-r1/codeforces
 lang:          cpp
-init_max_CL:   2048
-max_CL:        16384
 resume_path: null
-max_lr:        4e-5
+dist_backend: fsdp
 
 experiment:
   name: sphinxnautics
   output_dir: checkpoints/
   seed: 42
   id : 1
+
+tokenizer:
+  padding:    True #"max_length"
+  truncation: True
+  init_max_CL:   2048
+  max_CL:        16384
+
+learning:
+  max_lr: 4e-5  
+  lr_init_adjust_fac:  1 #to scale initial learning rate up or down 
+  lr_final_decay_fac:  0.25 #final_lr decay:relevant when using a decay schedule
+  weight_decay:        0.01 
+  keep_it_smooth:      True
 
 model:
   name: Qwen/Qwen2.5-7B-Instruct
@@ -23,25 +34,19 @@ teacher:
 
 # ──────────────────────────────────────────────────────────
 # SFT / Supervised trainer
+#exampple for unfreeze_ids: [[1,2,3,4,5,6,7,8,9,10,11,12],[1,2,3,4,5,6,7,8],[1,2,3,4],[1,2,3,4]]
 sft:
   num_epochs:          4
   max_step_per_epoch:  [500, 1000, 1000, 1000]
-  unfreeze_ids:        [[1,2,3,4,5,6,7,8,9,10,11,12],
-                        [1,2,3,4,5,6,7,8],
-                        [1,2,3,4],
-                        [1,2,3,4]]
-  total_batch_tokens:  131072 #      # 2**21
+  unfreeze_ids:        None
+  total_batch_tokens:  2097152 #      # 2**21
   micro_batch_size:    1
   keep_it_smooth:      true
   checkpoint_every:    500
   eval_every:          1000
   print_every:         25
-  enable_grad_chkpt:   True
-  lr_init_adjust_fac:  1 #to scale initial learning rate up or down 
-  lr_final_decay_fac:  0.25 #final_lr decay:relevant when using a decay schedule
-  weight_decay:        0.01 
+  enable_grad_chkpt:   False
   val_sample_per_gpu:  16
-  keep_it_smooth:      True
   do_eval:             False
 
 # Distillation / RL trainer
@@ -55,10 +60,6 @@ distill:
   checkpoint_every:    500
   print_every:         25
   enable_grad_chkpt:   True
-  lr_init_adjust_fac:  1 #to scale initial learning rate up or down 
-  lr_final_decay_fac:  0.25 #final_lr decay:relevant when using a decay schedule 
-  weight_decay:        0.01 
-  keep_it_smooth:      True
   do_eval:             False
 
 # Offline evaluation (eval_codeforces.py, compute_loss.py, etc.)

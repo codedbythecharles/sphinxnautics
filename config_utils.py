@@ -144,16 +144,17 @@ def _normalize_sft(sft: argparse.Namespace) -> None:
     sft.do_eval = _to_native(getattr(sft, "do_eval", None))
     sft.max_step_per_epoch = _to_native(getattr(sft, "max_step_per_epoch", None))
     
-    
-    # 1. Unfreeze layers
+    # ── 1. unfreeze_ids ──────────────────────────────────────
+    # None  →  [[]] for every epoch  (empty list == train all layers)
     if sft.unfreeze_ids is None:
-        sft.unfreeze_ids = [[0]] * sft.num_epochs
+        sft.unfreeze_ids = [[]] * sft.num_epochs
+    # Scalar list like [0,1,2] → wrap once per epoch
     elif not isinstance(sft.unfreeze_ids[0], list):
         sft.unfreeze_ids = [sft.unfreeze_ids]
-
     if len(sft.unfreeze_ids) < sft.num_epochs:
         pad = [sft.unfreeze_ids[-1]] * (sft.num_epochs - len(sft.unfreeze_ids))
         sft.unfreeze_ids += pad
+    print(f"************************sft unfreeze_ids{sft.unfreeze_ids}")
 
     # 2. Max steps per epoch
     if sft.max_step_per_epoch is None:
