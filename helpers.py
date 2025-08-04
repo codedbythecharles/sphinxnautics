@@ -864,19 +864,6 @@ def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos
                                     
         avg_loss = epoch_loss / epoch_steps
         print(f"Epoch {epoch + 1}/{num_epochs}, train Loss: {avg_loss})")#, test loss:{loss_eval}")
-    if (ddp_rank==0) and checkpoint_dir is not None:
-        print('writing to disk with',checkpoint_dir)
-        if total_steps % checkpoint_every == 0:
-            save_checkpoint(
-                model=model,
-                optimizer=optimizer,
-                scheduler=scheduler,
-                step=total_steps,
-                ckpt_dir=checkpoint_dir,
-                ckpt_style=ckpt_style,   # "auto" | "full" | "sharded"
-                filename_prefix=filename,
-                backend=dist_backend
-            )                    
     return total_steps
 
 

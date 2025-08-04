@@ -127,14 +127,26 @@ def distributed_eval(ddp_model, val_ds, tokenizer, cfg):
     return local_results
 
         # compute pass@k, dump JSON, etc.
+def is_fsdp_wrapped(model):
+    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+    return isinstance(model, FSDP) or any(isinstance(m, FSDP) for m in model.modules())
+def is_fsdp_wrapped(model):
+    from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+    return isinstance(model, FSDP) or any(isinstance(m, FSDP) for m in model.modules())
+
+def is_ddp_wrapped(model):
+    return isinstance(model, DDP) or any(isinstance(m, DDP) for m in model.modules())
 
 # ─────────────────────────────────────────────────────────────
 def wrapper(raw_model: torch.nn.Module, backend: str):
     if backend == "ddp":
-        from torch.nn.parallel import DistributedDataParallel as DDP
+        if is_ddp_wrapped(raw_model):
+            return raw_model
         return DDP(raw_model, device_ids=[torch.cuda.current_device()])
 
     elif backend == "fsdp":
+        if is_fsdp_wrapped(raw_model):
+            return raw_model
         from functools import partial
         from torch.distributed.fsdp import FullyShardedDataParallel as FSDP, MixedPrecision
         from torch.distributed.fsdp.wrap import size_based_auto_wrap_policy
@@ -157,7 +169,6 @@ def wrapper(raw_model: torch.nn.Module, backend: str):
         )
     else:
         raise ValueError(f"Unknown backend {backend}")
-# ─────────────────────────────────────────────────────────────
         
 
 def sanitize_filename(name):
@@ -191,45 +202,18 @@ def cfg_init(parser):
             
     return cfg
 
+
+def unwrap_model(model):
+    # DDP
+    if hasattr(model, 'module'):
+        return model.module
+    # FSDP
+    if isinstance(model, torch.distributed.fsdp.FullyShardedDataParallel):
+        return model._fsdp_wrapped_module
+    return model
+
         
 def main():
-    """
-    parser = argparse.ArgumentParser()
-    
-    #  ─── model / data ─────────────────────────────
-    model_name="Qwen/Qwen2.5-Coder-7B-Instruct"
-    parser.add_argument("--model_name",   default=model_name)
-    parser.add_argument("--verbose",action="store_true")
-    parser.add_argument("--train_dataset",      default='haj1r/sphinxnautics-codeforces-cot-v3')
-    parser.add_argument("--test_dataset",      default='open-r1/codeforces')
-    parser.add_argument("--checkpoint_every", type=int,      default=500)
-    parser.add_argument("--max_CL", type=int,      default=16384)
-    parser.add_argument("--checkpoint_dir", type=str,      default='checkpoints')
-    parser.add_argument("--experiment_id", type=int,      default=1)
-    parser.add_argument("--lr_fac", type=float,      default=1)
-    parser.add_argument("--init_max_CL", type=int,      default=None)
-    parser.add_argument("--split",        default="test")
-    parser.add_argument("--do_eval", type=ast.literal_eval,       default=None)
-    parser.add_argument("--keep_it_smooth",  action="store_true")
-    parser.add_argument("--num_epochs",    type=int,    default=10)
-    parser.add_argument("--unfreeze_ids",  type=ast.literal_eval,      default=None)
-    parser.add_argument("--max_step_per_epoch",  type=ast.literal_eval, default=None)
-    #  ─── eval specific ───────────────────────────
-    parser.add_argument("--eval_bs",      type=int,   default=8)
-#    parser.add_argument("--train_bs",      type=int,   default=8)
-    parser.add_argument("--val_sample_per_gpu",      type=int,   default=8)
-    parser.add_argument("--eval_temp",    type=float, default=0.001)
-    parser.add_argument("--lang",         default="cpp")
-    parser.add_argument("--at_k",         type=int,   default=1)
-    parser.add_argument("--with_reasoning", action="store_true")
-    parser.add_argument("--instruct_flag",  action="store_true")
-    #  ─── misc ────────────────────────────────────
-    parser.add_argument("--eval_every",   type=int, default=100)
-    # add to your arg parser / cfg
-    parser.add_argument("--resume_path", type=str, default=None,
-                        help="Path to a checkpoint .pt file OR a directory containing .pt files. "
-                            "If a directory, the checkpoint with the largest *_step_XXXX.pt is loaded.")
-    """
     cfg  = load_config()         # parses CLI
     logger = init_logger(cfg.logging.level,
                          cfg.experiment.output_dir,
@@ -294,7 +278,7 @@ def main():
     train_embedder=False
     batch_size=B
     max_new_tokens=8192
-    total_examples_per_gpu=2**13
+    total_examples_per_gpu=2**10
     temp=1
     horizon=50
     print_every=10
@@ -490,20 +474,28 @@ def main():
             logger.info(f"total optimizable parameters {total_opt_param/1e9} B")
 
         logger.info(f"backend: {cfg.dist_backend}")
+        logger.info(f"is_raw_fsdp_wrapped?: {is_fsdp_wrapped(raw_model)} isdp")
         model = wrapper(raw_model, cfg.dist_backend)
-        raw_model = model.module if cfg.dist_backend=='ddp' else model
+        logger.info(f"is_model_fsdp_wprapped?: {is_fsdp_wrapped(model)} isdp {cfg.dist_backend in ['ddp','fsdp']}")
+#        logger.info(f"ismodulefsdprapped?: {is_fsdp_wrapped(model.module)} isdp {cfg.dist_backend in ['ddp','fsdp']}")
+#        raw_model = model.module if cfg.dist_backend in ['ddp','fsdp'] else model
+   #     if cfg.dist_backend=='ddp':
+  #          raw_model = model.module 
+ #       else:
+#            raw_model = unwrap_model(model)
         ckpt_style= 'auto' if cfg.dist_backend=='ddp' else 'full'
 #        ckpt_style= 'auto'
         if sft.enable_grad_chkpt:
-            raw_model.gradient_checkpointing_enable()
+            model.gradient_checkpointing_enable()
         filename = f"{sanitized_model_name}/{cfg.train_dataset}/epoch_{epoch}"
         checkpoint_dir_=checkpoint_dir+'/'+filename
         if ddp_rank==0:
             os.makedirs(checkpoint_dir_, exist_ok=True)
         helpers.pretrain_simerr(model,train_loader,optimizer,scheduler,device,tokenizer.pad_token_id,tokenizer.eos_token_id,dataloader_test=val_loader,lah=lah,move_to_device=True,max_num_steps=sft.max_step_per_epoch[epoch],horizon=horizon,gradient_accumulation_steps=gradient_accumulation_steps,num_test_batches=30,print_per_batch=print_every,batch_size=batch_size,tokenizer=tokenizer,max_new_tokens=max_new_tokens,do_sample=True,temp=temp,ddp_rank=ddp_rank,ddp_world_size=ddp_world_size,writer=writer,checkpoint_dir=checkpoint_dir_,past_epoch_steps=sum(sft.max_step_per_epoch[:epoch]),start_step=start_step,unfreeze_idx=unfreeze_ids[-1],checkpoint_every=sft.checkpoint_every,ckpt_style=ckpt_style,dist_backend=cfg.dist_backend,eval_every=sft.eval_every)
-        logger.info('epoch ended...')
+        logger.info('epoch ended...')        
 #        raw_model=model.module
-        raw_model = model.module if cfg.dist_backend == "ddp" else model
+            
+        logger.info(f"is fsdpwrapped after model.module after epoch {is_fsdp_wrapped(raw_model)} {cfg.dist_backend in ['ddp','fsdp']}")
         start_step=0
         keep_opt_stat=False
         do_eval=sft.do_eval[epoch]
