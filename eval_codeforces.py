@@ -197,7 +197,7 @@ def main():
 
     port_cycle = itertools.cycle(port_list)
     def make_model(port):
-        logger.info('port is',port)
+        logger.info(f"port is {port}")
         endpoint = f"http://localhost:{port}/v1/chat/completions"
         return lambda prompt, k=args.at_k, temperature=args.temperature: query_model(
             prompt, k=k, temperature=temperature, endpoint=endpoint)

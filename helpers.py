@@ -1,5 +1,55 @@
-import os
-import torch
+# helpers.py  ─────────────────────────────────────────────────────────────
+from __future__ import annotations
+import os, torch
+from torch.distributed import is_initialized, get_rank
+from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.serialization import add_safe_globals
+from torch.distributed._shard.sharded_tensor.api import ShardedTensor
+from torch.distributed._shard.sharded_tensor.shard import Shard
+add_safe_globals([ShardedTensor, Shard])
+import importlib
+# ── FSDP core symbols (always needed for detection / context) ───────────
+try:  # PyTorch ≥ 2.0
+    from torch.distributed.fsdp import (
+        FullyShardedDataParallel as FSDP,
+        StateDictType,
+    )
+except ImportError:  # ultra-old dev wheels
+    from torch.distributed.fsdp.fully_sharded_data_parallel import (
+        FullyShardedDataParallel as FSDP,
+        StateDictType,
+    )
+
+# ── State-dict config classes (location changed in 2.2) ─────────────────
+try:                                           # ≥ 2.2
+    from torch.distributed.fsdp import FullStateDictConfig, ShardedStateDictConfig
+except ImportError:                            # 2.0 – 2.1
+    from torch.distributed.fsdp.fully_sharded_data_parallel import (
+        FullStateDictConfig,
+        ShardedStateDictConfig,
+    )
+
+# ── Version-adaptive import of save/load helpers (moved again in 2.5) ───
+def _import_fsdp_state_helpers():
+    candidate_modules = [
+        "torch.distributed.fsdp.api.state_dict",          # 2.5 – 2.7 (if built)
+        "torch.distributed.fsdp",                         # 2.2 – 2.4
+        "torch.distributed.fsdp.fully_sharded_data_parallel",  # 2.0 – 2.1
+    ]
+
+    for mod_name in candidate_modules:
+        try:
+            mod = importlib.import_module(mod_name)
+            if hasattr(mod, "save_state_dict") and hasattr(mod, "load_state_dict"):
+                return mod.save_state_dict, mod.load_state_dict
+        except ImportError:
+            continue   # try next
+
+    # Helpers not available in this build → return None so we can fallback
+    return None, None
+
+fsdp_save_state_dict, fsdp_load_state_dict = _import_fsdp_state_helpers()
+
 import re 
 import random
 import subprocess
@@ -13,7 +63,7 @@ import time
 import shutil
 import subprocess
 import torch.nn.functional as F
-
+from torch.distributed.fsdp import StateDictType, FullStateDictConfig
 
 incontext_mode_to_key={0:'zero',1:'short',2:'long',-1:'m1',-2:'m2'}
 
@@ -226,34 +276,64 @@ def configure_optimizers(m, weight_decay,print_it=True):
 accelerator = Accelerator()
 
 # Move model and dataloader to the proper device using the accelerator
-def evaluate_loss(model,dataloader,pad_token_id,device,num_test_epochs=1,moveflag=True,print_every=100):
-    model, dataloader = accelerator.prepare(model, dataloader)
-    pad_token_id=pad_token_id
-    total_test_steps=0
-    epoch_loss=0
+import torch
+from contextlib import nullcontext
+
+def evaluate_loss(
+    model,
+    dataloader,
+    pad_token_id,
+    device,
+    ddp_rank,
+    num_test_epochs: int = 1,
+    print_every: int = 100,
+    max_eval_step: int=200,
+):
     model.eval()
-#    model = model.to(device)
-    for idx, batch in enumerate(dataloader):
-        total_test_steps += 1        
-        inputs = batch['input_ids'][:,:]
-        attention_mask = batch['attention_mask'][:,:]
-        labels = batch['labels'][:,:]
-        B=inputs.shape[0]
-#        position_ids = torch.arange(0, inputs.size(1), dtype=torch.long, device=device).unsqueeze(0).expand_as(inputs)
-        if moveflag:
-            inputs = inputs.to(device)
-            attention_mask = attention_mask.to(device)
-            labels=labels.to(device)
- #           position_ids=position_ids.to(device)
-        with torch.no_grad():            
-            outputs = model(input_ids=inputs, labels=labels,attention_mask=attention_mask)#,position_ids=position_ids)
-#            print('shape',outputs.loss.item())
-            epoch_loss+=outputs.loss.mean().item()
-        if idx%print_every==0:
-            print('avg validation loss:',epoch_loss/total_test_steps)
-#        print(inputs.shape)
-    model.train()
-    return epoch_loss/total_test_steps
+    total_loss = 0.0
+    total_tokens = 0           # robust even if batch sizes differ
+    local_loss_sum = 0.0
+    local_token_sum = 0
+    # -------- forward loop --------
+    with torch.no_grad(),torch.autocast(device_type=device, dtype=torch.bfloat16):
+        for step, batch in enumerate(dataloader):
+            # Move to device *iff* dataloader hasn’t been prepared already
+            batch = {k: v.to(device) for k, v in batch.items()}
+
+            out   = model(
+                input_ids      = batch["input_ids"],
+                attention_mask = batch["attention_mask"],
+                labels         = batch["labels"],
+            )
+            loss = out.loss            # scalar per device
+
+            # --- gather & weight by #tokens so we get a true global average ---
+            bs_tokens = batch["labels"].numel()
+
+
+            local_loss  = loss.detach() * bs_tokens          # scalar
+            local_tok = torch.tensor(bs_tokens, device=loss.device)
+
+            # all-reduce across ranks
+#            torch.distributed.all_reduce(loss_sum, op=torch.distributed.ReduceOp.SUM)
+ #           torch.distributed.all_reduce(tok_tensor, op=torch.distributed.ReduceOp.SUM)
+
+            local_loss_sum   += local_loss.item()
+            local_token_sum += local_tok.item()
+
+            if (step % print_every == 0) and ddp_rank==0:
+                print(f"[eval] step {step:>4}  running avg loss "
+                      f"{local_loss_sum/local_token_sum :.6f}")
+            if ((step+1)%max_eval_step ==0):
+                break
+#    loss_tensor = torch.tensor([local_loss_sum, local_token_sum],
+  #                          device=device, dtype=torch.float64)
+ #   torch.distributed.all_reduce(loss_tensor, op=torch.distributed.ReduceOp.SUM)
+   # global_loss_sum, global_token_sum = loss_tensor.tolist()
+    model.train()             # back to train mode
+    return local_loss_sum / local_token_sum
+
+#    return total_loss / total_tokens        # global (world-size) average
 
 
 #distillation/RL with a teacher
@@ -449,7 +529,7 @@ def distill_simerr(model,teacher,dataloader,optimizer,scheduler,device,pad_token
                 break
 
         if dataloader_test is not None:
-            loss_eval=evaluate_loss(model,dataloader_test,pad_token_id,device,num_test_epochs=1)
+            loss_eval=evaluate_loss(model,dataloader_test,pad_token_id,device,ddp_rank,num_test_epochs=1)
 
         avg_loss = epoch_loss / epoch_steps
         print(f"Epoch {epoch + 1}/{num_epochs}, train Loss: {avg_loss})")#, test loss:{loss_eval}")
@@ -465,7 +545,169 @@ def distill_simerr(model,teacher,dataloader,optimizer,scheduler,device,pad_token
 
 
 
-def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos_token_id,num_helper_samples=5,optimizer_helper=None,helper=None,move_to_device=False,max_num_steps=None,dataloader_test=None,horizon=1,gradient_accumulation_steps=8,num_epochs=1,num_test_batches=30,print_per_batch=10,batch_size=8,lah=0,temp=0.001,max_new_tokens=256,tokenizer=None,do_sample=False,with_ddp=True,ddp_rank=0,ddp_world_size=1,device_type='cuda',checkpoint_every=500,filename='model',writer=None,past_epoch_steps=0,checkpoint_dir=None,start_step=0,unfreeze_idx=0,eval_every=100,verbose=False):
+
+def _is_fsdp(model):
+    return FSDP is not None and isinstance(model, FSDP)
+
+
+def _is_ddp(model):
+    return isinstance(model, DDP)
+
+
+def save_checkpoint(
+    *,
+    model,
+    optimizer,
+    scheduler,
+    step: int,
+    ckpt_dir: str,
+    ckpt_style: str = "auto",      # "auto" | "full" | "sharded"
+    filename_prefix: str = "model",
+    backend="fsdp", 
+):
+    """
+    Unified checkpoint saver for both DDP and FSDP.
+
+    ckpt_style:
+        * "auto"     –  full for DDP, sharded for FSDP
+        * "full"     –  single file on rank-0
+        * "sharded"  –  FSDP shards (every rank writes its part)
+    """
+    os.makedirs(ckpt_dir, exist_ok=True)
+
+    # ---- world info ----
+    dist_on  = is_initialized()
+    rank     = get_rank() if dist_on else 0
+#    backend  = "fsdp" if _is_fsdp(model) else "ddp"
+
+    if ckpt_style == "auto":
+        ckpt_style = "sharded" if backend == "fsdp" else "full"
+
+    # ------------------------------------------------------------------ #
+    #  FULL CHECKPOINT  (single .pt written by rank-0)                   #
+    # ------------------------------------------------------------------ #
+    if ckpt_style == "full":
+        if backend == "fsdp":
+            full_cfg = FullStateDictConfig(offload_to_cpu=True, rank0_only=True)
+            with FSDP.state_dict_type(model,
+                                      StateDictType.FULL_STATE_DICT,
+                                      full_cfg):
+                model_sd = model.state_dict()
+        else:                          # DDP or single-GPU
+            wrapped = getattr(model, "module", None)
+            model_sd = (wrapped or model).state_dict()
+
+        if rank == 0:                  # only one process hits the disk
+            ckpt_path = os.path.join(
+                ckpt_dir, f"{filename_prefix}_step_{step}.pt"
+            )
+            torch.save(
+                {
+                    "step": step,
+                    "model_state_dict": model_sd,
+                    "optimizer_state_dict": optimizer.state_dict(),
+                    "scheduler_state_dict": scheduler.state_dict(),
+                },
+                ckpt_path,
+                _use_new_zipfile_serialization=False,
+            )
+
+    # ------------------------------------------------------------------ #
+    #  SHARDED CHECKPOINT  (FSDP only; every rank writes its own shard)  #
+    # ------------------------------------------------------------------ #
+    elif ckpt_style == "sharded":
+        if backend != "fsdp":
+            raise ValueError(
+                "ckpt_style='sharded' is only valid when the model "
+                "is wrapped with FSDP."
+            )
+
+        shard_cfg = ShardedStateDictConfig(offload_to_cpu=True)
+        with FSDP.state_dict_type(model,
+                                  StateDictType.SHARDED_STATE_DICT,
+                                  shard_cfg):
+            shard_state = model.state_dict()
+
+        # Saves as ckpt_dir/rank00-model.pt, rank01-model.pt, …
+        if callable(fsdp_save_state_dict):
+            # Helper exists → use it
+            fsdp_save_state_dict(shard_state, ckpt_dir, tags={"step": step})
+        else:
+            # Fallback: each rank writes its own shard
+            torch.save(
+                shard_state,
+                os.path.join(ckpt_dir, f"{filename_prefix}_rank{rank:02d}_step_{step}.pt"),
+            )
+    else:
+        raise ValueError(f"Unknown ckpt_style '{ckpt_style}'")
+
+
+# ---------------------------------------------------------------------- #
+#  Optional symmetrical loader                                           #
+# ---------------------------------------------------------------------- #
+def _shard_to_local(state):
+    """Replace ShardedTensor values by their .local_tensor()."""
+    out = {}
+    for k, v in state.items():
+        if isinstance(v, ShardedTensor):
+            out[k] = v.local_tensor()            # returns a plain torch.Tensor
+        else:
+            out[k] = v
+    return out
+
+def load_checkpoint(model, ckpt_path: str, map_location="cpu"):
+    """
+    Accepts either
+      • a single full-checkpoint file
+      • a directory containing FSDP shards
+    Returns  (step, opt_state_dict | None, sched_state_dict | None)
+    """
+    # ── FULL single-file checkpoint ───────────────────────────────
+    # -------- FULL single file ---------------------------------------
+    if os.path.isfile(ckpt_path):
+        ckpt = torch.load(ckpt_path, map_location=map_location)
+
+        if isinstance(model, FSDP):            # FSDP needs full-dict context
+            full_cfg = FullStateDictConfig(offload_to_cpu=True, rank0_only=False)
+            with FSDP.state_dict_type(model,
+                                      StateDictType.FULL_STATE_DICT,
+                                      full_cfg):
+                model.load_state_dict(ckpt["model_state_dict"])
+        else:                                  # DDP / single GPU
+            model.load_state_dict(ckpt["model_state_dict"])
+
+        return (ckpt["step"],
+                ckpt.get("optimizer_state_dict"),
+                ckpt.get("scheduler_state_dict"))
+        
+    # ── SHARDED FSDP directory ────────────────────────────────────
+    shard_cfg = ShardedStateDictConfig(offload_to_cpu=True)
+    with FSDP.state_dict_type(model,
+                              StateDictType.SHARDED_STATE_DICT,
+                              shard_cfg):
+        if callable(fsdp_load_state_dict):                 # helper available
+            shard_state = fsdp_load_state_dict(ckpt_path)
+        else:                                              # manual fallback
+            rank = get_rank() if is_initialized() else 0
+            # glob the first matching shard for this rank
+            shard_file = next(
+                f for f in os.listdir(ckpt_path)
+                if f.startswith(f"model_rank{rank:02d}_") and f.endswith(".pt")
+            )
+            shard_state = torch.load(
+                os.path.join(ckpt_path, shard_file),
+                map_location=map_location,
+                weights_only=False,          # already added
+            )
+
+            shard_state = _shard_to_local(shard_state)        # ← NEW LINE
+        model.load_state_dict(shard_state, strict=False)  # 
+#        model.load_state_dict(shard_state)
+
+    step = shard_state.get("meta", {}).get("step", 0)
+    return step, None, None
+
+def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos_token_id,num_helper_samples=5,optimizer_helper=None,helper=None,move_to_device=False,max_num_steps=None,dataloader_test=None,horizon=1,gradient_accumulation_steps=8,num_epochs=1,num_test_batches=30,print_per_batch=10,batch_size=8,lah=0,temp=0.001,max_new_tokens=256,tokenizer=None,do_sample=False,with_ddp=True,ddp_rank=0,ddp_world_size=1,device_type='cuda',checkpoint_every=500,filename='model',writer=None,past_epoch_steps=0,checkpoint_dir=None,start_step=0,unfreeze_idx=0,eval_every=100,ckpt_style='auto',dist_backend='ddp',verbose=False):
     losses=[]
     total_steps=start_step
     total_processes_samples=0
@@ -572,15 +814,20 @@ def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos
                         writer.add_scalar("LR", current_lr, past_epoch_steps+total_steps)
                     # Save model checkpoint
                 torch.cuda.empty_cache()    
-                loss_local=0
-            if ddp_rank==0 and checkpoint_dir is not None:
+                loss_local=0                  
+            
+            if (ddp_rank==0) and checkpoint_dir is not None:
                 if total_steps % checkpoint_every == 0:
-                    torch.save({
-                        "step": total_steps,
-                        "model_state_dict": model.module.state_dict(),
-                        "optimizer_state_dict": optimizer.state_dict(),
-                        "scheduler_state_dict": scheduler.state_dict()
-                    }, os.path.join(checkpoint_dir, f"{filename}_step_{total_steps}.pt"))                    
+                    save_checkpoint(
+                        model=model,
+                        optimizer=optimizer,
+                        scheduler=scheduler,
+                        step=total_steps,
+                        ckpt_dir=checkpoint_dir,
+                        ckpt_style=ckpt_style,   # "auto" | "full" | "sharded"
+                        filename_prefix=filename,
+                        backend=dist_backend
+                    )                    
             """"
             logits = outputs.logits
 
@@ -608,7 +855,7 @@ def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos
             if (max_num_steps is not None) and (total_steps>=max_num_steps):
                 break
             if dataloader_test is not None and total_steps%eval_every==0:
-                loss_eval=torch.tensor(evaluate_loss(model,dataloader_test,pad_token_id,device,num_test_epochs=1),device=device)
+                loss_eval=torch.tensor(evaluate_loss(model,dataloader_test,pad_token_id,device,ddp_rank,num_test_epochs=1),device=device)
                 torch.distributed.all_reduce(loss_eval, op=torch.distributed.ReduceOp.AVG)
                 if ddp_rank==0:
                     print(f"Step {epoch + 1}/{num_epochs}, val Loss: {loss_eval})")#, test loss:{loss_eval}")
@@ -617,14 +864,19 @@ def pretrain_simerr(model,dataloader,optimizer,scheduler,device,pad_token_id,eos
                                     
         avg_loss = epoch_loss / epoch_steps
         print(f"Epoch {epoch + 1}/{num_epochs}, train Loss: {avg_loss})")#, test loss:{loss_eval}")
-    if ddp_rank==0 and checkpoint_dir is not None:
+    if (ddp_rank==0) and checkpoint_dir is not None:
         print('writing to disk with',checkpoint_dir)
-        torch.save({
-            "step": total_steps,
-            "model_state_dict": model.module.state_dict(),
-            "optimizer_state_dict": optimizer.state_dict(),
-            "scheduler_state_dict": scheduler.state_dict()
-        }, os.path.join(checkpoint_dir, f"{filename}_step_{total_steps}.pt"))     
+        if total_steps % checkpoint_every == 0:
+            save_checkpoint(
+                model=model,
+                optimizer=optimizer,
+                scheduler=scheduler,
+                step=total_steps,
+                ckpt_dir=checkpoint_dir,
+                ckpt_style=ckpt_style,   # "auto" | "full" | "sharded"
+                filename_prefix=filename,
+                backend=dist_backend
+            )                    
     return total_steps
 
 

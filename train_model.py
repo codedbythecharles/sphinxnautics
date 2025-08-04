@@ -20,6 +20,7 @@ from torch.distributed import init_process_group, destroy_process_group
 from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.distributed as dist
 from torch.utils.data import DataLoader
+from torch.distributed import barrier, is_initialized
 from torch.utils.tensorboard import SummaryWriter
 
 from functools import partial
@@ -234,10 +235,11 @@ def main():
                          cfg.experiment.output_dir,
                          rank=int(os.getenv("RANK", "0")))
     sft  = select(cfg, "sft")    # task block
+    eval_cfg  = select(cfg, "eval")    # task block
     learning  = select(cfg, "learning")    # task block
     tokcfg =select(cfg, "tokenizer")
     _normalize_sft(sft)
-
+    B=sft.micro_batch_size
     
     # saving configs to run and chekpoint folders for reproduciblity
     run_dir = Path(f"runs/exp{cfg.experiment.id}")
@@ -292,7 +294,7 @@ def main():
     train_embedder=False
     batch_size=B
     max_new_tokens=8192
-    total_examples_per_gpu=2**11
+    total_examples_per_gpu=2**13
     temp=1
     horizon=50
     print_every=10
@@ -312,17 +314,18 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.manual_seed(1337)
 
+
     # prepare the dataset for train/val loss
     data_codeforces_cot_train = load_dataset(cfg.train_dataset,split='train')#['train']load_from_disk(cfg.train_dataset,split='train')
     data_codeforces_cot_val = load_dataset(cfg.train_dataset,split='validation')
     #prepaer the dataset for end to end testing
-    test_ds_full = load_dataset(cfg.test_dataset, split="test").select(range(sft.val_sample_per_gpu*ddp_world_size))
+    
+    test_ds_full = load_dataset(eval_cfg.dataset, split="test").select(range(sft.val_sample_per_gpu*ddp_world_size))
     logger.info(f"full ds len {len(test_ds_full)} ddp_rank {ddp_rank} ddp_worldsize {ddp_world_size}")    
 
 #load_from_disk("codeforces_cot_filtered")
     
-    keep_opt_stat=False
-    total_steps=(total_examples_per_gpu//gradient_accumulation_steps)* sft.num_epochs
+    """
     if cfg.resume_path is not None:
         optim_groups=helpers.configure_optimizers(model,weight_decay,print_it=False)
         optimizer=torch.optim.AdamW(optim_groups,lr=max_lr,fused=use_fused) 
@@ -335,6 +338,35 @@ def main():
         )
         keep_opt_stat=True
         print('schedulers last recorded epoch',scheduler.last_epoch)
+    else:
+        optimizer=None
+        scheduler=None
+
+    start_step, start_epoch, loaded_path = helpers.load_checkpoint_if_any(
+        cfg.resume_path,
+        model=model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        map_location=map_loc,
+        ddp_wrapped=False,
+        strict=True,
+    )
+    """
+    
+    keep_opt_stat=False
+    total_steps=(total_examples_per_gpu//gradient_accumulation_steps)* sft.num_epochs
+    if cfg.resume_path is not None:
+        # 2. ALWAYS create the optimizer & scheduler ------------
+        optim_groups=helpers.configure_optimizers(model,weight_decay)
+        optimizer=torch.optim.AdamW(optim_groups,lr=max_lr,fused=use_fused) 
+        scheduler = get_polynomial_decay_schedule_with_warmup(
+            optimizer,
+            num_warmup_steps=num_warmup_steps,
+            num_training_steps=total_steps,
+            lr_end=final_lr,
+            power=1.0,   # linear
+        )
+
     else:
         optimizer=None
         scheduler=None
@@ -366,7 +398,14 @@ def main():
 #    import code;code.interact(local=locals())
     for epoch in range(start_epoch,sft.num_epochs):
         print("▶ unfreeze_ids type:", type(sft.unfreeze_ids),'layers',sft.unfreeze_ids)
-        tokenized_dataset_train=data_codeforces_cot_train.select(range(total_examples_per_gpu*ddp_world_size)).map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
+        total = total_examples_per_gpu * ddp_world_size
+        
+        max_size = len(data_codeforces_cot_train)
+
+        # Cap the selection to available size
+        num_samples = min(total, max_size)
+
+        tokenized_dataset_train=data_codeforces_cot_train.select(range(num_samples)).map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
             'context_length':min([int(tokcfg.init_max_CL*2**epoch),tokcfg.max_CL]),'tokenizer':tokenizer,'truncation':tokcfg.truncation,'padding':tokcfg.padding})
         tokenized_dataset_val=data_codeforces_cot_val.map(helpers.tokenize_codeforce, batched=False,fn_kwargs={
             'context_length':min([int(tokcfg.init_max_CL*2**epoch),tokcfg.max_CL]),'tokenizer':tokenizer,'truncation':tokcfg.truncation,'padding':tokcfg.padding})
@@ -405,6 +444,7 @@ def main():
         )
         
         logger.info(f"number of training iterations in process {ddp_rank}:{len(train_loader),len(sampler)}")
+        logger.info(f"number of validation iterations in process {ddp_rank}:{len(val_loader),len(val_sampler)}")
         
         
         
@@ -430,7 +470,7 @@ def main():
             adjusted_lr_fac=1.0
             if learning.keep_it_smooth:
                 adjusted_lr_fac=1/num_trainable_layers*2
-            optim_groups=helpers.configure_optimizers(raw_model,weight_decay,print_it=False)
+            optim_groups=helpers.configure_optimizers(raw_model,weight_decay)
             optimizer=torch.optim.AdamW(optim_groups,lr=max([max_lr*adjusted_lr_fac,final_lr*1.1]),fused=use_fused) 
             scheduler = get_polynomial_decay_schedule_with_warmup(
                 optimizer,
@@ -452,13 +492,15 @@ def main():
         logger.info(f"backend: {cfg.dist_backend}")
         model = wrapper(raw_model, cfg.dist_backend)
         raw_model = model.module if cfg.dist_backend=='ddp' else model
+        ckpt_style= 'auto' if cfg.dist_backend=='ddp' else 'full'
+#        ckpt_style= 'auto'
         if sft.enable_grad_chkpt:
             raw_model.gradient_checkpointing_enable()
         filename = f"{sanitized_model_name}/{cfg.train_dataset}/epoch_{epoch}"
         checkpoint_dir_=checkpoint_dir+'/'+filename
         if ddp_rank==0:
             os.makedirs(checkpoint_dir_, exist_ok=True)
-        helpers.pretrain_simerr(model,train_loader,optimizer,scheduler,device,tokenizer.pad_token_id,tokenizer.eos_token_id,dataloader_test=val_loader,lah=lah,move_to_device=True,max_num_steps=sft.max_step_per_epoch[epoch],horizon=horizon,gradient_accumulation_steps=gradient_accumulation_steps,num_test_batches=30,print_per_batch=print_every,batch_size=batch_size,tokenizer=tokenizer,max_new_tokens=max_new_tokens,do_sample=True,temp=temp,ddp_rank=ddp_rank,ddp_world_size=ddp_world_size,writer=writer,checkpoint_dir=checkpoint_dir_,past_epoch_steps=sum(sft.max_step_per_epoch[:epoch]),start_step=start_step,unfreeze_idx=unfreeze_ids[-1],checkpoint_every=sft.checkpoint_every,eval_every=sft.eval_every)
+        helpers.pretrain_simerr(model,train_loader,optimizer,scheduler,device,tokenizer.pad_token_id,tokenizer.eos_token_id,dataloader_test=val_loader,lah=lah,move_to_device=True,max_num_steps=sft.max_step_per_epoch[epoch],horizon=horizon,gradient_accumulation_steps=gradient_accumulation_steps,num_test_batches=30,print_per_batch=print_every,batch_size=batch_size,tokenizer=tokenizer,max_new_tokens=max_new_tokens,do_sample=True,temp=temp,ddp_rank=ddp_rank,ddp_world_size=ddp_world_size,writer=writer,checkpoint_dir=checkpoint_dir_,past_epoch_steps=sum(sft.max_step_per_epoch[:epoch]),start_step=start_step,unfreeze_idx=unfreeze_ids[-1],checkpoint_every=sft.checkpoint_every,ckpt_style=ckpt_style,dist_backend=cfg.dist_backend,eval_every=sft.eval_every)
         logger.info('epoch ended...')
 #        raw_model=model.module
         raw_model = model.module if cfg.dist_backend == "ddp" else model
